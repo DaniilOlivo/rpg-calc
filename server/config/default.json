@@ -1,0 +1,13 @@
+{
+    "port": 5500,
+    "host": "127.0.0.1",
+
+    "auth": {
+        "file": "users.json"
+    },
+
+    "client": {
+        "index": "../client/build/index.html",
+        "static": "../client/build/static"
+    }
+}
