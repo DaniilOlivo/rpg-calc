@@ -1,0 +1,26 @@
+.scale_solid__fill {
+    height: 100%;
+}
+
+.scale_solid__label {
+    position: absolute;
+
+    top: 0;
+
+    width: 100%;
+
+    font-style: italic;
+    text-align: center;
+}
+
+.scale_solid__fill_hp {
+    background-color: #B90000;
+}
+
+.scale_solid__fill_sp {
+    background-color: #01870E;
+}
+
+.scale_solid__fill_mp {
+    background-color: #0452C8;
+}

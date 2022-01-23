@@ -1,0 +1,18 @@
+.scale_segment {
+    width: 90px;
+}
+
+.scale_segment__fill {
+    height: 100%;
+    display: inline-block;
+}
+
+.scale_segment__fill_orange {
+    background-color: #E17A00;
+    border: 1px solid #472B00;
+}
+
+.scale_segment__fill_lime {
+    background: #99E100;
+    border: 1px solid #304700;
+}

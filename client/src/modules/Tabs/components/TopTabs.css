@@ -1,0 +1,49 @@
+.tabs_top {
+    display: flex;
+    flex-direction: column;
+
+    position: relative;
+}
+
+.tab_top {
+    display: inline-block;
+    cursor: pointer;
+
+    padding: 20px 40px;
+
+    position: relative;
+    border: none;
+
+    background: url("img/tab.png");
+    width: 189px;
+    height: 60px;
+    outline: none;
+
+    font-family: SeoulHangang;
+    font-size: 24px;
+    text-transform: capitalize;
+
+    color: #A67A44;
+
+    margin-left: -28px;
+
+    transition: all 200ms;
+}
+
+.tab_top:nth-child(1) {
+    margin-left: 0;
+}
+
+.tab_top:hover {
+    color: #F1BA87;
+}
+
+.tab_top_active {
+    background: url("img/tab_active.png");
+    color: #F1BA87;
+    z-index: 8 !important;
+}
+
+.tabs_top__panel_btns {
+    margin-bottom: -5px;
+}

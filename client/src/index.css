@@ -1,0 +1,57 @@
+/* Импорт шрифтов */
+@font-face {
+  src: url("./fonts/SeoulHangang.ttf");
+  font-family: SeoulHangang;
+}
+
+@font-face {
+  src: url("./fonts/Lora.ttf");
+  font-family: Lora;
+}
+
+/* Сброс базовых стилей */
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+/* Основные блоки */
+body {
+  background: #7E4724 url("./img/bg.png");
+  background-size: cover;
+  background-position: center;
+
+  font-family: Lora;
+  font-size: 18px;
+  color: #26190D;
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: 100vh;
+}
+
+.wrap_index {
+  justify-content: flex-start;
+}
+
+/* Логотип */
+.logo__load {
+  margin-bottom: -230px;
+  position: relative;
+  top: -230px;
+}
+
+.logo__index {
+  height: 180px;
+  margin-top: 10px;
+  margin-bottom: -10px;
+}

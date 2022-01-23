@@ -1,0 +1,12 @@
+.block {
+    border: 4px solid #594022;
+    padding: 25px 30px;
+    padding-top: 0;
+}
+
+.block__title {
+    font-family: SeoulHangang;
+    font-size: 18px;
+    text-decoration: underline;
+    text-align: center;
+}

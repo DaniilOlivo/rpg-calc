@@ -1,0 +1,15 @@
+.scale {
+    width: 175px;
+    height: 25px;
+
+    background: #A67A44;
+    border: 2px solid #594022;
+
+    box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+
+    box-sizing: content-box;
+
+    position: relative;
+
+    margin-bottom: 15px;
+}

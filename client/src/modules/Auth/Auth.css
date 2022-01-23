@@ -1,0 +1,68 @@
+.logo__auth {
+    margin-bottom: -230px;
+    position: relative;
+    top: -230px;
+}
+
+.auth {
+    background: url("img/auth.png");
+    background-repeat: no-repeat;
+
+    width: 312px;
+    height: 360px;
+
+    padding: 20px 6px;
+}
+
+.auth__form {
+    margin: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.auth__label {
+    color: #F1BA87;
+    margin-bottom: 12px;
+}
+
+.auth__input {
+    border: none;
+    background: #594022;
+    box-shadow: 5px 5px 3px rgba(0, 0, 0, 0.25);
+
+    height: 28px;
+    width: 160px;
+
+    padding: 0 10px;
+    margin-bottom: 25px;
+
+    text-align: center;
+
+    font-family: Lora;
+    color: #F1BA87;
+    font-size: 18px;
+
+    transition: all 200ms;
+}
+
+.auth__sumbit {
+    font-style: italic;
+    text-decoration: underline;
+    color: #A67A44;
+    font-size: 18px;
+
+    background-color: transparent;
+    border: none;
+
+    transition: all 200ms;
+}
+
+.auth__sumbit:hover {
+    color: #AB340E;
+}
+
+.auth__input:focus {
+    background-color: #896436;
+}
