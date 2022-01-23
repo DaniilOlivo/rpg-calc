@@ -1,0 +1,12 @@
+.char-main {
+    display: grid;
+    grid-template-columns: 480px 400px;
+    grid-template-rows: 230px auto 195px;
+    grid-template-areas:
+        "Params Effects"
+        "Params Features"
+        "Chars Features";
+    
+    column-gap: 20px;
+    row-gap: 15px;
+}

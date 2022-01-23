@@ -1,0 +1,17 @@
+.char-features__feature {
+    margin-top: 5px;
+    list-style:  none;
+    padding-left: 20px;
+    position: relative;
+}
+
+.char-features__feature::before {
+    content: "";
+    left: 0;
+    top: 5px;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: #594022;
+    transform: rotate(45deg);
+}

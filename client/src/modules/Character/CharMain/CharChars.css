@@ -1,0 +1,22 @@
+.char-chars {
+    margin-top: 15px;
+
+    display: grid;
+
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+
+    row-gap: 10px;
+}
+
+.char-chars__line {
+    display: flex;
+    justify-content: space-between;
+
+    margin-right: 25px;
+}
+
+.char-chars__label {
+    font-family: SeoulHangang;
+    color: #26190D;
+}

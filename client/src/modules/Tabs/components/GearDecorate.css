@@ -1,0 +1,14 @@
+.tabs__gear {
+    position: absolute;
+    z-index: -10;
+    top: 20px;
+    left: -80px;
+}
+
+.tabs__gear_rotate {
+    animation: rotate 2s;
+}
+
+.tabs__gear_rotate_reverse {
+    animation: rotate 2s reverse;
+}

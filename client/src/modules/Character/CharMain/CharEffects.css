@@ -1,0 +1,30 @@
+.char-effects {
+    margin-top: 15px;
+}
+
+.char-effects__block {
+    display: flex;
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+
+    border-bottom-width: 3px;
+    border-bottom-style: solid;
+}
+
+.char-effects__time {
+    font-size: 14px;
+}
+
+.char-effects__negative {
+    border-bottom-color:#C52300;
+}
+
+.char-effects__positive {
+    border-bottom-color:#0A8407;
+}
+
+.char-effects__neutral {
+    border-bottom-color:#594022;
+}
+
