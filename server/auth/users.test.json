@@ -1,0 +1,17 @@
+[
+    {
+        "id": 1,
+        "username": "Поркчоп",
+        "password": "UltraPass",
+        "admin": false,
+        "character": "Барак"
+    },
+
+    {
+        "id": 2,
+        "username": "Чан Кочан",
+        "password": "12345",
+        "admin": true,
+        "character": null
+    }
+]
