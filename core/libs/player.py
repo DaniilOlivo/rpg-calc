@@ -1,4 +1,4 @@
-from base import Tree, GroupTree, get_config
+from libs.base import Tree, get_config
 
 class CharTable (Tree):
     def __init__(self):
@@ -6,23 +6,13 @@ class CharTable (Tree):
         super().__init__(config)
     
 
-class SkillTable (GroupTree):
-    def __init__(self, level=0, xp=0):
-        super().__init__("data/skills.json")
-
-        self.add_config_value("level", 0)
-        self.add_config_value("xp", 0)
-        self.add_config_value("xp_limit", 0)
-
-
 class Player:
-    file_races = "data/race.json"
+    file_races = "race.json"
 
     def __init__(self,
         name: str,
         race: str,
         chars=CharTable(),
-        skills=SkillTable(),
         **options
         ):
 
@@ -31,14 +21,10 @@ class Player:
         self.race = self.get_race(race)
         self.race_title = self.race["title"]
 
-        if "level" in options:
-            self.level = options["level"]
-        else:
-            self.level = 1
-        self.xp = 0
-
         self.chars = chars
-        self.skills = skills
+        
+        for char, value in self.race["chars"].items():
+            self.chars.add_mod_value(char, "Раса", value)
 
         self._init_param()
         self._init_needs()
@@ -75,10 +61,8 @@ class Player:
         self.need_eat = self.need_eat_max
         self.need_sleep = self.need_sleep_max
 
-    
     def get_race(self, title: str):
-        races = Tree.read_json(self.file_races)
-
+        races = get_config(self.file_races)
         for race in races:
             if race["title"] == title:
                 return race
