@@ -1,0 +1,9 @@
+[
+    {
+        "id": 1,
+        "username": "Поркчоп",
+        "password": 12345,
+        "admin": false,
+        "character": "Барак"
+    }
+]
