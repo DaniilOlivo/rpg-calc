@@ -17,7 +17,7 @@ class App extends React.Component {
   createWS() {
     this.socket = new WebSocket(
       "ws://"
-      + window.location.host
+      + "127.0.0.1:5500"
       + "/ws/table"
     )
 
@@ -62,6 +62,7 @@ class App extends React.Component {
   loadResourses = () => {
     this.setState({content: < LoadBox />})
     setTimeout(() => this.setState({content: < TabsControl />}), 10000)
+    this.createWS()
   }
 
   render() {
