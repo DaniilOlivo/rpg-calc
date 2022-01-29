@@ -1,7 +1,7 @@
 import "./CharParam.css"
 
-import ScaleSolid from "../../../components/Scales/ScaleSolid"
-import ScaleSegment from "../../../components/Scales/ScaleSegment"
+import ScaleSolid from "../../../../components/Scales/ScaleSolid"
+import ScaleSegment from "../../../../components/Scales/ScaleSegment"
 
 function CharParam(props) {
     return (
@@ -11,8 +11,8 @@ function CharParam(props) {
             <div className="char-param__scales_main">
                 < ScaleSolid
                     title="hp"
-                    currentValue="20"
-                    maxValue="30"
+                    currentValue={props.hp}
+                    maxValue={props.maxHp}
                     classNameColor="scale_solid__fill_hp" />
                 < ScaleSolid
                     title="sp"
