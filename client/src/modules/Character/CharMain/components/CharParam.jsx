@@ -16,31 +16,31 @@ function CharParam(props) {
                     classNameColor="scale_solid__fill_hp" />
                 < ScaleSolid
                     title="sp"
-                    currentValue="24"
-                    maxValue="24"
+                    currentValue={props.sp}
+                    maxValue={props.maxSp}
                     classNameColor="scale_solid__fill_sp" />
                 < ScaleSolid
                     title="mp"
-                    currentValue="0"
-                    maxValue="10"
+                    currentValue={props.mp}
+                    maxValue={props.maxMp}
                     classNameColor="scale_solid__fill_mp" />
             </div>
 
             <div className="char-param__main">
-                <p>Имя</p>
-                <p>Раса</p>
+                <p>{props.name}</p>
+                <p>{props.race}</p>
             </div>
 
             <div className="char-param__scales_second">
                 <span>Голод: </span>
                 < ScaleSegment 
-                    currentValue="2"
-                    maxValue="5"
+                    currentValue={props.hunger}
+                    maxValue={props.maxHunger}
                     classNameColor="scale_segment__fill_orange" />
                 <span>Усталость: </span>
                 < ScaleSegment 
-                    currentValue="5"
-                    maxValue="5"
+                    currentValue={props.fatigue}
+                    maxValue={props.maxFatigue}
                     classNameColor="scale_segment__fill_lime" />
             </div>
         </div>

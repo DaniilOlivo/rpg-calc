@@ -7,6 +7,8 @@ import AuthApp from './modules/Auth/Auth';
 
 import TabsControl from "./modules/Tabs/TabsControl"
 
+import { initCharMain } from './modules/Character/CharMain/api';
+
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -27,6 +29,10 @@ class App extends React.Component {
             console.log(data.test)
         } else if (data.logChat) {
             this.refLogChat.current.pushLog(data.logChat)
+        } else if (data.package) {
+          if (data.initFlag) {
+            initCharMain(data.package)
+          }
         }
     }
 
@@ -63,6 +69,12 @@ class App extends React.Component {
     this.setState({content: < LoadBox />})
     setTimeout(() => this.setState({content: < TabsControl />}), 10000)
     this.createWS()
+    this.socket.onopen = () => {
+      let request = JSON.stringify({
+        type: "GET",
+      })
+      this.socket.send(request)
+    }
   }
 
   render() {

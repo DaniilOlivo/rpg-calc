@@ -13,7 +13,7 @@ function CharMainView(props) {
     return (
         <div className="char-main">
             <Block title="Параметры" idArea="Params">
-                < CharParam {...props.params} />
+                < CharParam {...props.params} name={props.name} race={props.race} />
             </Block>
 
             <Block title="Эффекты" idArea="Effects">
@@ -32,9 +32,7 @@ function CharMainView(props) {
 }
 
 function mapStateToProps(state) {
-    return {
-        params: state.get("params")
-    }
+    return state.toObject()
 }
 
 let CharMainWrap = connect(mapStateToProps)(CharMainView)
