@@ -71,3 +71,21 @@ class Player:
 
     def __str__(self):
         return self.name
+
+    def decode(self):
+        return {
+            "name": self.name,
+            "race": self.race_title,
+            "params": {
+                "hp": self.hp,
+                "maxHp": self.hp_max,
+                "sp": self.sp,
+                "maxSp": self.sp_max,
+                "mp": self.mp,
+                "maxMp": self.mp_max,
+                "hunger": self.need_eat,
+                "maxHunger": self.need_eat_max,
+                "fatigue": self.need_sleep,
+                "maxFatigue": self.need_sleep_max
+            }
+        }
