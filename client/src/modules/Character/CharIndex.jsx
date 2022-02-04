@@ -5,7 +5,7 @@ import bioImage from "./icons/bio.png"
 import CharMain from "./CharMain"
 
 const charIndex = new Map([
-    [charImage, < CharMain />],
+    [charImage, CharMain],
     [skillsImage, "Навыки"],
     [bioImage, "Биография"]
 ])
