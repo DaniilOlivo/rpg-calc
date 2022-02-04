@@ -1,4 +1,5 @@
-from sys import argv
+from sys import argv, path
+import json
 import libs.player as player
 from ioController import IO_Controller
 
@@ -9,5 +10,5 @@ def getData(name_char: str):
 
 if __name__ == "__main__":
     if (argv[1] == "GET"):
-        data = getData(argv[2])
+        data = json.dumps(getData(argv[2]))
         print(data)

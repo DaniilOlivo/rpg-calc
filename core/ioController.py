@@ -4,7 +4,7 @@ from os import path
 class IO_Controller:
     extension = ".pickle"
     def __init__(self, save_directory: str):
-        self.save_directory = path.abspath(save_directory)
+        self.save_directory = path.join(path.dirname(__file__), save_directory)
 
     def get_path(self, name_file):
         return path.join(self.save_directory, name_file + self.extension)

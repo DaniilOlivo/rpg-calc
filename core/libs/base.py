@@ -4,7 +4,7 @@ import json
 dir_config = "config"
 
 def get_config(name_config: str):
-    with open(path.join("libs", dir_config, name_config), "r", encoding="utf-8") as f:
+    with open(path.join(path.dirname(__file__), dir_config, name_config), "r", encoding="utf-8") as f:
         data = json.load(f)
     return data
 

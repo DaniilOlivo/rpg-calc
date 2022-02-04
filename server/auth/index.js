@@ -43,18 +43,18 @@ function authMiddleware(req, res, next) {
 
 const router = express.Router()
 
-function isAdmin(req) {
+function getUserSession(req) {
     return {
-        user: true,
+        user: req.user.username,
         admin: req.user.admin
     }
 }
 
-router.post("/login", passport.authenticate("local"), (req, res) => res.json(isAdmin(req)))
+router.post("/login", passport.authenticate("local"), (req, res) => res.json(getUserSession(req)))
 router.get("/user", (req, res) => {
     let dataRes = {user: false}
 
-    if (req.user) dataRes = isAdmin(req)
+    if (req.user) dataRes = getUserSession(req)
 
     res.json(dataRes)
 })

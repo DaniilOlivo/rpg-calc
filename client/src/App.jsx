@@ -47,7 +47,7 @@ class App extends React.Component {
       let dataUser = await response.json()
       if (dataUser.user) {
         this.setState({
-          user: true,
+          user: dataUser.user,
           admin: dataUser.admin
         })
       }
@@ -70,6 +70,11 @@ class App extends React.Component {
     setTimeout(() => this.setState({content: < TabsControl />}), 10000)
     this.createWS()
     this.socket.onopen = () => {
+      this.socket.send(JSON.stringify({
+        type: "REGISTER",
+        user: this.state.user
+      }))
+
       let request = JSON.stringify({
         type: "GET",
       })
