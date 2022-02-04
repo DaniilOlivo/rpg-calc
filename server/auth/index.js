@@ -5,6 +5,8 @@ const path = require("path")
 
 const fs = require("fs")
 
+let dbAuth = null
+
 function configirePassport(dbFile) {
     dbAuth = path.resolve(__dirname, dbFile)
 
@@ -29,6 +31,11 @@ function configirePassport(dbFile) {
     }))
 }
 
+function getUser(username) {
+    let arrUsers = JSON.parse(fs.readFileSync(dbAuth))
+    return arrUsers.find((user) => username == user.username)
+}
+
 function authMiddleware(req, res, next) {
     if (req.user) next()
     else res.redirect("/login")
@@ -36,18 +43,18 @@ function authMiddleware(req, res, next) {
 
 const router = express.Router()
 
-function getUser(req) {
+function isAdmin(req) {
     return {
         user: true,
         admin: req.user.admin
     }
 }
 
-router.post("/login", passport.authenticate("local"), (req, res) => res.json(getUser(req)))
+router.post("/login", passport.authenticate("local"), (req, res) => res.json(isAdmin(req)))
 router.get("/user", (req, res) => {
     let dataRes = {user: false}
 
-    if (req.user) dataRes = getUser(req)
+    if (req.user) dataRes = isAdmin(req)
 
     res.json(dataRes)
 })
@@ -56,6 +63,7 @@ router.get("/user", (req, res) => {
 module.exports = {
     configirePassport,
     authMiddleware,
-    router
+    router,
+    getUser
 }
 

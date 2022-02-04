@@ -1,6 +1,8 @@
 const express = require("express")
 const ws = require("express-ws")
 
+const callCore = require("../python_api").callCore
+
 const wsRouter = express.Router()
 ws(wsRouter)
 
@@ -21,6 +23,13 @@ wsRouter.ws("/table", (ws, req) => {
     ws.on("message", (data) => {
         let validData = JSON.parse(data)
         if (validData.type === "test") ws.send("Its work!")
+        if (validData.type === "GET") {
+            let char = req.user.character
+            callCore(validData.type, char, (err, results) => {
+                if (err) throw err
+                ws.send(results[0])
+            })
+        }
     })
 
     ws.on("close", () => {
