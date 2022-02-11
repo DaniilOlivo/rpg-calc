@@ -33,6 +33,11 @@ class App extends React.Component {
           if (data.initFlag) {
             initCharMain(data.package)
           }
+        } else if (data.type === "SuccesRegister") {
+          let request = JSON.stringify({
+            type: "GET",
+          })
+          this.socket.send(request)
         }
     }
 
@@ -70,10 +75,17 @@ class App extends React.Component {
     setTimeout(() => this.setState({content: < TabsControl />}), 10000)
     this.createWS()
     this.socket.onopen = () => {
+<<<<<<< Updated upstream
       let request = JSON.stringify({
         type: "GET",
       })
       this.socket.send(request)
+=======
+      this.socket.send(JSON.stringify({
+        type: "REGISTER",
+        user: this.state.user
+      }))
+>>>>>>> Stashed changes
     }
   }
 
