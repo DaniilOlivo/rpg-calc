@@ -7,10 +7,12 @@ const expressWs = require("express-ws")
 
 const auth = require("../auth")
 const ws = require("../ws")
+const db = require("../db")
 
 const app = express()
 expressWs(app)
 
+db.openDb()
 app.use(express.json())
 app.use(session({
     secret: "You Died",
@@ -19,7 +21,7 @@ app.use(session({
 }))
 app.use(passport.initialize())
 app.use(passport.session())
-auth.configirePassport(config.get("auth.file"))
+auth.configirePassport()
 
 function logger(req, res) {
     let logMessage = `HTTP | ${req.method} ${req.url} ${res.statusCode}`

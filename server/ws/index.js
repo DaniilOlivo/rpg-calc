@@ -1,7 +1,7 @@
 const express = require("express")
 const ws = require("express-ws")
 
-const getUser = require("../auth").getUser
+const user = require("../db").user
 const callCore = require("../python_api").callCore
 
 const wsRouter = express.Router()
@@ -21,10 +21,15 @@ wsRouter.ws("/table", (ws, req) => {
         if (validData.type === "test") ws.send("Its work!")
         if (validData.type === "REGISTER") {
             logger("REGISTER, " + validData.user)
-            journalWs.push({
-                ws,
-                user: getUser(validData.user)
-            })
+            user.getUser({username: validData.user})
+                .then((user) => {
+                    console.log("Пользователь " + user)
+                    journalWs.push({
+                        ws,
+                        user
+                    })
+                    ws.send(JSON.stringify({type: "SuccesRegister"}))
+                })
         }
         if (validData.type === "GET") {
             logger("GET")

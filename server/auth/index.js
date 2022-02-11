@@ -1,39 +1,28 @@
 const express = require("express")
 const passport = require("passport")
 const Strategy = require("passport-local").Strategy
-const path = require("path")
+const db = require("../db")
 
-const fs = require("fs")
-
-let dbAuth = null
-
-function configirePassport(dbFile) {
-    dbAuth = path.resolve(__dirname, dbFile)
-
+function configirePassport() {
     passport.serializeUser((user, done) => done(null, user))
     passport.deserializeUser((user, done) => done(null, user))
 
     passport.use(new Strategy((username, password, done) => {
-        let arrUsers = JSON.parse(fs.readFileSync(dbAuth))
-        let userLogin = arrUsers.find((user) => username == user.username && password == user.password)
-
-        if (userLogin) {
-            return done(null, {
-                userId: userLogin.id,
-                username,
-                character: userLogin.character,
-                admin: userLogin.admin,
+        db.user.getUser({username, password})
+            .then(userLogin => {
+                if (userLogin) {
+                    return done(null, {
+                        userId: userLogin.id,
+                        username,
+                        character: userLogin.character,
+                        admin: userLogin.admin,
+                    })
+                }
+                else {
+                    return done(null, false)
+                }
             })
-        }
-        else {
-            return done(null, false)
-        }
     }))
-}
-
-function getUser(username) {
-    let arrUsers = JSON.parse(fs.readFileSync(dbAuth))
-    return arrUsers.find((user) => username == user.username)
 }
 
 function authMiddleware(req, res, next) {
@@ -63,7 +52,6 @@ router.get("/user", (req, res) => {
 module.exports = {
     configirePassport,
     authMiddleware,
-    router,
-    getUser
+    router
 }
 

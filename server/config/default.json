@@ -9,5 +9,9 @@
     "client": {
         "index": "../client/build/index.html",
         "static": "../client/build/static"
+    },
+
+    "db": {
+        "mongodb": "mongodb://localhost:27017/"
     }
 }

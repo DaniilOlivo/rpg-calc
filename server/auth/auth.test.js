@@ -16,7 +16,7 @@ describe("Аутентификация", () => {
         agent_1.post("/auth/login")
             .send({username: "Поркчоп", password: "UltraPass"})
             .expect(200, {
-                user: true,
+                user: "Поркчоп",
                 admin: false
             })
             .end(done)
@@ -26,7 +26,7 @@ describe("Аутентификация", () => {
     it("Пользователь в сессии", (done) => {
         agent_1.get("/auth/user")
             .expect(200, {
-                user: true,
+                user: "Поркчоп",
                 admin: false
             })
             .end(done)
