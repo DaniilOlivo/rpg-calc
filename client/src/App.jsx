@@ -33,6 +33,11 @@ class App extends React.Component {
           if (data.initFlag) {
             initCharMain(data.package)
           }
+        } else if (data.type === "SuccesRegister") {
+          let request = JSON.stringify({
+            type: "GET",
+          })
+          this.socket.send(request)
         }
     }
 
@@ -74,11 +79,6 @@ class App extends React.Component {
         type: "REGISTER",
         user: this.state.user
       }))
-
-      let request = JSON.stringify({
-        type: "GET",
-      })
-      this.socket.send(request)
     }
   }
 
