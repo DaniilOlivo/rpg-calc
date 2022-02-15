@@ -1,19 +1,38 @@
-const mongoose = require("mongoose")
+const connection = require("./connection")
+const sequelize = require("sequelize")
 
-const userScheme = mongoose.Schema({
-    username: String,
-    password: String,
-    admin: Boolean,
-    character: String,
-    avatar: String,
-    pickle: Buffer
-})
+const User = connection.define("User", {
+    username: {
+        type: sequelize.STRING,
+        allowNull: false,
+        unique: true
+    },
 
-const User = mongoose.model("User", userScheme)
+    password: {
+        type: sequelize.STRING,
+        allowNull: false
+    },
+    
+    admin: {
+        type: sequelize.BOOLEAN,
+        defaultValue: false
+    },
+
+    character: {
+        type: sequelize.STRING
+    },
+
+    avatar: {
+        type: sequelize.STRING
+    },
+
+    pickle: {
+        type: sequelize.BLOB
+    }
+}, {timestamps: false})
 
 async function getUser(filter={}) {
-    let user = await User.findOne(filter)
-    return user
+    return User.findOne({where: filter})
 }
 
 module.exports = {

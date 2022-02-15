@@ -7,12 +7,10 @@ const expressWs = require("express-ws")
 
 const auth = require("../auth")
 const ws = require("../ws")
-const db = require("../db")
 
 const app = express()
 expressWs(app)
 
-db.openDb()
 app.use(express.json())
 app.use(session({
     secret: "You Died",

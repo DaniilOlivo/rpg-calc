@@ -3,14 +3,14 @@
     "version": "1.0.0",
     "dependencies": {
         "config": "^3.3.7",
-        "connect-flash": "^0.1.1",
         "express": "^4.17.2",
         "express-session": "^1.17.2",
         "express-ws": "^5.0.2",
-        "mongoose": "^6.2.1",
         "passport": "^0.5.2",
         "passport-local": "^1.0.0",
+        "pg": "^8.7.3",
         "python-shell": "^3.0.1",
+        "sequelize": "^6.16.1",
         "ws": "^8.4.2"
     },
     "scripts": {

@@ -12,6 +12,7 @@
     },
 
     "db": {
-        "mongodb": "mongodb://localhost:27017/"
+        "mongodb": "mongodb://localhost:27017/",
+        "postgres": "postgres://postgres:admin@localhost:5432/postgres"
     }
 }

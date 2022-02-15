@@ -1,22 +1,25 @@
-const mongoose = require("mongoose")
-const config = require("config")
-
+const connection = require("./connection")
 const user = require("./user")
 
-async function openDb() {
-    mongoose.connect(config.get("db.mongodb"))
-
-    mongoose.connection.on("connected", () => console.log("Подключение к базе данных"))
-    mongoose.connection.on("error", (err) => console.log("Ошибка подключения к базе данных: " + err))
-    mongoose.connection.on("disconnected", () => console.log("Отключение от базы данных"))
+async function test() {
+    let result
+    try {
+        await connection.authenticate()
+        result = true
+    } catch (error) {
+        result =false
+    }
+    
+    return result
 }
 
 async function closeDb() {
-    mongoose.disconnect()
+    await connection.close()
+    console.log("Соединение с базой закрыто")
 }
 
 module.exports = {
-    openDb,
+    test,
     closeDb,
     user,
 }
