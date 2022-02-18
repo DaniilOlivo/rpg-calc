@@ -23,7 +23,6 @@ wsRouter.ws("/table", (ws, req) => {
             logger("REGISTER, " + validData.user)
             user.getUser({username: validData.user})
                 .then((user) => {
-                    console.log("Пользователь " + user)
                     journalWs.push({
                         ws,
                         user

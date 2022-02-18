@@ -1,14 +1,24 @@
 from sys import argv, path
 import json
-import libs.player as player
-from ioController import IO_Controller
+import pickle
+from db.character import Character
 
-def getData(name_char: str):
-    io_controller = IO_Controller("players")
-    player = io_controller.load(name_char)
-    return player.decode()
+def getChar(char: str):
+    return Character.get(Character.name == char)
+
+def writePickle(char: str, player: object):
+    recordChar = getChar(char)
+    recordChar.pickle = pickle.dumps(player)
+    recordChar.save()
+
+def loadPickle(char: str):
+    recordChar = getChar(char)
+    player = pickle.loads(recordChar.pickle)
+    return player
+
 
 if __name__ == "__main__":
     if (argv[1] == "GET"):
-        data = json.dumps(getData(argv[2]))
+        playerObj = loadPickle(argv[2])
+        data = json.dumps(playerObj.decode())
         print(data)

@@ -1,6 +1,8 @@
 import libs.player as player
-from ioController import IO_Controller
+import pickle
+from db.character import Character
 
 if __name__ == "__main__":
-    test = player.Player("Барак", "Орк")
-    IO_Controller("players").write("Барак", test)
+    Character.create_table()
+    record = Character(name="Барак", pickle=pickle.dumps(player.Player("Барак", "Орк")))
+    record.save()
