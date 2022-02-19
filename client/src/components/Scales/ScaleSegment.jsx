@@ -12,7 +12,7 @@ class ScaleSegment extends React.Component {
         let className = "scale_segment__fill " + this.props.classNameColor
 
         for (let i = 0; i < currentValue; i++) {
-            arrSegments.push(<div className={className} style={{"width": widthSegment}}></div>)
+            arrSegments.push(<div key={i} className={className} style={{"width": widthSegment}}></div>)
         }
 
         return (

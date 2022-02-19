@@ -3,11 +3,11 @@ import TopTabs from "./components/TopTabs";
 import SubTabs from "./components/SubTabs";
 import GearDecorate from "./components/GearDecorate";
 
-import charIndex from "../Character/CharIndex";
-import journalIndex from "../Journal/JournalIndex";
-import inventoryIndex from "../Inventory/InventoryIndex";
-import magicIndex from "../Magic/MagicIndex";
-import actionsIndex from "../Actions/ActionsIndex";
+import charIndex from "../gameModules/Character/CharIndex";
+import journalIndex from "../gameModules/Journal/JournalIndex";
+import inventoryIndex from "../gameModules/Inventory/InventoryIndex";
+import magicIndex from "../gameModules/Magic/MagicIndex";
+import actionsIndex from "../gameModules/Actions/ActionsIndex";
 
 const tabsStruct = {
     "Персонаж": charIndex,

@@ -13,7 +13,7 @@ const exampleFeatures = [
 
 function CharFeatures(props) {
     let arrFeatures = []
-    let count
+    let count = 0
 
     for (let feature of exampleFeatures) {
         arrFeatures.push(<li className="char-features__feature" key={count}>{feature}</li>)

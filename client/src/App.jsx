@@ -7,43 +7,14 @@ import AuthApp from './modules/Auth/Auth';
 
 import TabsControl from "./modules/Tabs/TabsControl"
 
-import { initCharMain } from './modules/Character/CharMain/api';
+import Socket from './modules/Socket/Socket';
+import { setData } from './modules/Redux/api'
 
 class App extends React.Component {
   constructor(props) {
     super(props)
 
     this.state = {content: null, user: false, admin: false}
-  }
-
-  createWS() {
-    this.socket = new WebSocket(
-      "ws://"
-      + "127.0.0.1:5500"
-      + "/ws/table"
-    )
-
-    this.socket.onmessage = (e) => {
-        let data = JSON.parse(e.data);
-        if (data.test) {
-            console.log(data.test)
-        } else if (data.logChat) {
-            this.refLogChat.current.pushLog(data.logChat)
-        } else if (data.package) {
-          if (data.initFlag) {
-            initCharMain(data.package)
-          }
-        } else if (data.type === "SuccesRegister") {
-          let request = JSON.stringify({
-            type: "GET",
-          })
-          this.socket.send(request)
-        }
-    }
-
-    this.socket.onclose = () => {
-        console.log("Что-то пошло не так")
-    }
   }
 
   async componentDidMount() {
@@ -73,13 +44,9 @@ class App extends React.Component {
   loadResourses = () => {
     this.setState({content: < LoadBox />})
     setTimeout(() => this.setState({content: < TabsControl />}), 10000)
-    this.createWS()
-    this.socket.onopen = () => {
-      this.socket.send(JSON.stringify({
-        type: "REGISTER",
-        user: this.state.user
-      }))
-    }
+    this.socket = new Socket(this.state.user, {
+      package: setData
+    })
   }
 
   render() {

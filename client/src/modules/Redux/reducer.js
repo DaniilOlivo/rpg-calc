@@ -1,9 +1,7 @@
 import { Map } from "immutable"
 
 function reducer(state=Map(), action) {
-    if (action.type === "INIT") {
-        return Map(action.values)
-    }
+    if (action.type === "SET") return Map(action.data)
     return state
 }
 

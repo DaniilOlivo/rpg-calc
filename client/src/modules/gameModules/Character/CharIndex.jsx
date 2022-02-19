@@ -1,11 +1,13 @@
+import getView from "../../Redux/views"
+
 import charImage from "./icons/char.png"
 import skillsImage from "./icons/skills.png"
 import bioImage from "./icons/bio.png"
 
-import CharMain from "./CharMain"
+import CharMain from "./CharMain/CharMain"
 
 const charIndex = new Map([
-    [charImage, CharMain],
+    [charImage, getView(CharMain, "charMain")],
     [skillsImage, "Навыки"],
     [bioImage, "Биография"]
 ])
