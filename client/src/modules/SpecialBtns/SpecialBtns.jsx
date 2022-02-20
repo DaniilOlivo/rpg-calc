@@ -3,6 +3,8 @@ import React from "react"
 import menuImage from "./img/menu.png"
 import "./SpecialBtns.css"
 
+import versions from "../../data/versions-logs.json"
+
 // Абстрактный класс для кнопок использующих модальные окна
 // Потому что в санном JS нет нормальной реализации миксинов
 class BtnModal extends React.Component {
@@ -28,7 +30,18 @@ class BtnModal extends React.Component {
 
 class BtnLog extends BtnModal {
     componentDidMount() {
-        this.setState({content: "Версии"})
+        let content = []
+        
+        for (let [version, listChanges] of Object.entries(versions)) {
+            content.push(<p key={version} className="logs__title">{version}</p>)
+            let liElements = []
+            for (let i = 0; i < listChanges.length; i++) {
+                let elem = <li key={i}>{listChanges[i]}</li>
+                liElements.push(elem)
+            }
+            content.push(<ul key={version + "changes"} className="logs__list-changes">{liElements}</ul>)
+        }
+        this.setState({content})
     }
 
     render() {
@@ -45,7 +58,10 @@ class BtnLog extends BtnModal {
 
 // Функции разработчика
 function ExitProfile(props) {
-    let onClick = (e) => console.log("Типа вышли из профиля")
+    let onClick = async (e) => {
+        let response = await fetch("/auth/logout", {method: "POST"})
+        if (response.ok) window.location.href = response.url
+    }
     return <button className="dev-func__btn" onClick={onClick}>Выйти из профиля</button>
 }
 

@@ -33,10 +33,15 @@ class AuthApp extends React.Component {
         }
     }
 
+    onKeyDown = (e) => {
+        if (e.key === "ArrowDown") this.refPass.current.focus()
+        if (e.key === "ArrowUp") this.refLogin.current.focus()
+    }
+
     render() {
         return (
             <section className="auth">
-                <form className="auth__form">
+                <form className="auth__form" onKeyDown={this.onKeyDown}>
                     <label htmlFor="login" className="auth__label">Логин</label>
                     <input type="text" className="auth__input" ref={this.refLogin} />
 

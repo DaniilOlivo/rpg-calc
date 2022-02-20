@@ -29,10 +29,14 @@ class Socket extends WebSocket {
         this.send({signal: "GET"})
     }
 
+    signalGetAll() {
+        this.send({signal: "GET_ALL"})
+    }
+
     signalRegister() {
         let packageWs = {
             signal: "REGISTER",
-            user: this.user
+            user: this.user.username
         }
         this.send(packageWs)
     }
@@ -43,7 +47,10 @@ class Socket extends WebSocket {
         if (data.package) this.handlers.package(data.package)
         if (data.signal) {
             let signal = data.signal
-            if (signal === "REGISTER") this.signalGet()
+            if (signal === "REGISTER") {
+                if (this.user.admin) this.signalGetAll()
+                else this.signalGet()
+            }
         }
     }
 }

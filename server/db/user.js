@@ -25,17 +25,18 @@ const User = connection.define("User", {
     avatar: {
         type: sequelize.STRING
     },
-
-    pickle: {
-        type: sequelize.BLOB
-    }
 }, {timestamps: false})
 
 async function getUser(filter={}) {
     return User.findOne({where: filter})
 }
 
+async function getAllUsers() {
+    return User.findAll()
+}
+
 module.exports = {
     model: User,
-    getUser
+    getUser,
+    getAllUsers,
 }

@@ -47,6 +47,10 @@ router.get("/user", (req, res) => {
 
     res.json(dataRes)
 })
+router.post("/logout", (req, res) => {
+    req.logout()
+    res.redirect("/")
+})
 
 
 module.exports = {

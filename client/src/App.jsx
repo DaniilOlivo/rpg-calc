@@ -44,7 +44,11 @@ class App extends React.Component {
   loadResourses = () => {
     this.setState({content: < LoadBox />})
     setTimeout(() => this.setState({content: < TabsControl />}), 10000)
-    this.socket = new Socket(this.state.user, {
+    this.socket = new Socket({
+      username: this.state.user,
+      admin: this.state.admin  
+    }, 
+    {
       package: setData
     })
   }

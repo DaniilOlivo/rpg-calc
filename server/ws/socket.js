@@ -1,4 +1,5 @@
 const callCore = require("../python_api").callCore
+const { getAllUsers } = require("../db").user
 
 class Socket {
     constructor(ws, journalWs) {
@@ -25,18 +26,24 @@ class Socket {
         this.send({signal: "REGISTER"})
     }
 
-    async getDataCore() {
-        let user = this.journalWs.getUser(this.ws)
+    async getDataCore(user) {
+        if (!user) user = this.journalWs.getUser(this.ws)
         Socket.logger("Get character " + user.username)
         let dataChar = await callCore("GET", user.character)
         this.send({package: dataChar})
+    }
+
+    async getAllDataCore() {
+        let users = await getAllUsers()
+        this.getDataCore(users[0])
     }
 
     dispatcher(packageWs) {
         let signal = packageWs.signal
         if (signal === "PING") this.pingPong()
         if (signal === "REGISTER") this.register(packageWs.user)
-        if (signal === "GET") this.getDataCore() 
+        if (signal === "GET") this.getDataCore()
+        if (signal === "GET_ALL") this.getAllDataCore()
     }
 }
 
