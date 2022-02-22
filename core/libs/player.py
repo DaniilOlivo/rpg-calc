@@ -1,10 +1,67 @@
-from libs.base import Tree, get_config
+from libs.base import Tree, ModValues, DynamicTree, get_config
 
-class CharTable (Tree):
+class ParamTable (Tree):
     def __init__(self):
+        super().__init__()
+        self.params = ("hp", "mp", "sp", "hunger", "fatigue")
+        self.add_items(self.params)
+
+        self.add_key("max", 0)
+        self.add_key("current", 0)
+    
+    def full(self, param=None):
+        if param:
+            items = (param)
+        else:
+            items = self.params
+        
+        for item in items:
+            self[item]["current"] = self[item]["max"]
+
+
+class CharTable (ModValues):
+    def __init__(self, mapChar={}):
         config = get_config("chars.json")
         super().__init__(config)
+        if mapChar:
+            self.update_base_values(mapChar)
+
+
+class EffectsTable (DynamicTree):
+    def __init__(self):
+        super().__init__()
+
+        self.units = {
+            "logic": ("turn", "hour", "day"),
+            "alias": ("Ход", "Час", "День",)
+        }
+
+        self.add_key("shade", "neutral")
+        self.add_key("timeNumber", 1)
+        self.add_key("timeUnit", "turn")
+        self.add_key("timeUnitAlias", "ход")
     
+    def translate(self, item: str):
+        value = self[item]["timeUnit"]
+        index = self.units["logic"].index(value)
+        self[item]["timeUnitAlias"] = self.units["alias"][index]
+    
+    def add_item(self, item, **keys):
+        super().add_item(item)
+        for key, value in keys.items():
+            self[item][key] = value
+        self.translate(item)
+
+
+class FeaturesTable (DynamicTree):
+    def __init__(self):
+        super().__init__()
+        self.add_key("desc", "")
+    
+    def add_item(self, item, desc: str):
+        super().add_item(item)
+        self[item]["desc"] = desc
+
 
 class Player:
     file_races = "race.json"
@@ -18,50 +75,44 @@ class Player:
 
         self.name = name
 
-        self.race = self.get_race(race)
+        self.race = self._get_race(race)
         self.race_title = self.race["title"]
+        self.speed = self.race["speed"]
 
-        self.chars = chars
+        self.chars = chars 
         
         for char, value in self.race["chars"].items():
             self.chars.add_mod_value(char, "Раса", value)
 
-        self._init_param()
-        self._init_needs()
+        self.params = ParamTable()
+        self.effects = EffectsTable()
+        self.features = FeaturesTable()
 
-    def _init_param(self):
-        base = 5
-
-        endurance = self.chars.get_value("Выносливость")
-        willpower = self.chars.get_value("Сила воли")
+        self.calc()
+        self.params.full()
         
-        self.hp_max = base + endurance
-        self.mp_max = base + willpower
-        self.sp_max = base + (willpower + endurance) / 2
 
-        self.hp = self.hp_max
-        self.mp = self.mp_max
-        self.sp = self.sp_max
+    def calc(self):
+        self._calc_params()
 
-        self.speed = self.race["speed"]
-
-    def _init_needs(self):
-        self.need_eat_max = 5
-        self.need_sleep_max = 5
-
-        endurance = self.chars.get_value("Выносливость")
+    def _calc_params(self):
+        base = 5
+        endurance = self.chars.get_value("END")
+        willpower = self.chars.get_value("WIL")
+        
+        self.params["hp"]["max"] = base + endurance
+        self.params["mp"]["max"] = base + willpower
+        self.params["sp"]["max"] = base + (willpower + endurance) / 2
 
         if (endurance > 10):
-            self.need_eat_max += 1
-            self.need_sleep_max += 1
+            base += 1
         elif (endurance <= 5):
-            self.need_eat_max -= 1
-            self.need_sleep_max -= 1
+            base -= 1
         
-        self.need_eat = self.need_eat_max
-        self.need_sleep = self.need_sleep_max
+        self.params["hunger"]["max"] = base
+        self.params["fatigue"]["max"] = base
 
-    def get_race(self, title: str):
+    def _get_race(self, title: str):
         races = get_config(self.file_races)
         for race in races:
             if race["title"] == title:
@@ -77,17 +128,9 @@ class Player:
             "charMain": {
                 "name": self.name,
                 "race": self.race_title,
-                "params": {
-                    "hp": self.hp,
-                    "maxHp": self.hp_max,
-                    "sp": self.sp,
-                    "maxSp": self.sp_max,
-                    "mp": self.mp,
-                    "maxMp": self.mp_max,
-                    "hunger": self.need_eat,
-                    "maxHunger": self.need_eat_max,
-                    "fatigue": self.need_sleep,
-                    "maxFatigue": self.need_sleep_max
-                }
+                "params": self.params,
+                "chars": self.chars,
+                "effects": self.effects,
+                "features": self.features
             }
         }
