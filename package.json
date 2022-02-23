@@ -5,7 +5,7 @@
         "dev-client": "cd client && npm start",
         "dev-server": "cd server && npm run start-dev",
         "start-dev": "concurrently npm:dev-server npm:dev-client",
-        "start": "cd server && npm install && node index.js",
+        "start": "cd server && node index.js",
         "build-client": "cd client && npm install && npm run build",
         "build-server": "cd server && npm install",
         "heroku-postbuild": "npm run build-server && npm run build-client"
