@@ -6,7 +6,9 @@
         "dev-server": "cd server && npm run start-dev",
         "start-dev": "concurrently npm:dev-server npm:dev-client",
         "start": "cd server && npm install && node index.js",
-        "heroku-postbuild": "cd client && npm install && npm run build"
+        "build-client": "cd client && npm install && npm run build",
+        "build-server": "cd server && npm install",
+        "heroku-postbuild": "npm run build-server && npm run build-client"
     },
     "devDependencies": {
         "concurrently": "^7.0.0"
