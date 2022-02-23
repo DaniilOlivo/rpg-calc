@@ -6,4 +6,4 @@ try:
 except:
     connectionString = "postgresql://postgres:admin@localhost:5432/postgres"
 
-db = connect(connectionString)
+db = connect(connectionString, sslmode='require')
