@@ -1,4 +1,5 @@
 import "./CharChars.css"
+import Tip from "../../../../../components/Tip"
 
 function CharChars(props) {
     let arrChars = []
@@ -6,7 +7,7 @@ function CharChars(props) {
     let count = 0
 
     for (let objChar of Object.values(props)) {
-        let line = <div className="char-chars__line" key={count} >
+        let line = <div className="char-chars__line" key={count} data-tip={objChar.desc} >
                 <span className="char-chars__label">{objChar.alias}</span>
                 <span className="char-chars__value">{objChar.value}</span>
             </div>
@@ -20,6 +21,7 @@ function CharChars(props) {
     return (
         <div className="char-chars">
             {arrChars}
+            < Tip />
         </div>
     )
 }
