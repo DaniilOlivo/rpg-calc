@@ -5,8 +5,7 @@ function callCore(method, data) {
     let options = {
         args: [method, data],
         scriptPath: path.resolve("../core"),
-        mode: "json",
-        pythonPath: path.resolve("../core/venv/Scripts/python")
+        mode: "json"
     }
 
     return new Promise((resolve, reject) => {

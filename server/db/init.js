@@ -3,14 +3,20 @@ const User = require("./user").model
 async function init() {
     await User.sync({force: true})
     User.create({
-        username: "Поркчоп",
-        password: "UltraPass",
-        character: "Барак",
-        avatar: "/media/Барак.jpg"
+        username: "Слава",
+        password: "Slava2sm",
+        character: "Эндрю Брант",
+        avatar: "/media/Брант.jpg"
     })
     User.create({
-        username: "Чан Кочан",
-        password: "12345",
+        username: "Сергей",
+        password: "UltraPassword",
+        character: "Джон Королев",
+        avatar: "/media/Королев.jpg"
+    })
+    User.create({
+        username: "Даниил",
+        password: "Master42",
         admin: true
     })
 }
