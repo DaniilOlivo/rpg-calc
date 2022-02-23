@@ -15,15 +15,15 @@ function CharMain(props) {
             </Block>
 
             <Block title="Эффекты" idArea="Effects">
-                < CharEffects />
+                < CharEffects {...props.effects} />
             </Block>
 
             <Block title="Характеристики" idArea="Chars">
-                < CharChars />
+                < CharChars {...props.chars} />
             </Block>
 
             <Block title="Особенности" idArea="Features">
-                < CharFeatures />
+                < CharFeatures {...props.features} />
             </Block>
         </div>
     )

@@ -45,16 +45,23 @@ class ModValues(Tree):
         for item in self:
             self[item]["mod_values"] = {}
         self.add_key("base_value", 0)
+        self.add_key("value", 0)
 
     def update_base_values(self, mapValues: dict):
         for item, value in mapValues.items():
             self[item]["base_value"] = value
+            self._calc(item)
+
+    def _calc(self, item: str):
+        self[item]["value"] = self.get_value(item)
 
     def add_mod_value(self, item: str, mod_label: str, mod_value: int):
         self[item]["mod_values"][mod_label] = mod_value
+        self._calc(item)
     
     def del_mod_value(self, item: str, mod_label: str):
         return self[item]["mod_values"].pop(mod_label)
+        self._calc(item)
 
     def get_value(self, item: str):
         total_value = self[item]["base_value"]
