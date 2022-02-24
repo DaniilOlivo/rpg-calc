@@ -1,5 +1,5 @@
 
-const wsConnect = "ws://127.0.0.1:5500/ws/table"
+const wsConnect = "wss://127.0.0.1:5500/ws/table"
 
 class Socket extends WebSocket {
     constructor(user, handlers) {
