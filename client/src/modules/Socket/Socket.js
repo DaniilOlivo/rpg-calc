@@ -1,5 +1,5 @@
 
-const wsConnect = "wss://127.0.0.1:5500/ws/table"
+const wsConnect = "wss://rpg-calc.herokuapp.com/ws/table"
 
 class Socket extends WebSocket {
     constructor(user, handlers) {
