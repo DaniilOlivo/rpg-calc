@@ -25,14 +25,19 @@ const User = connection.define("User", {
     avatar: {
         type: sequelize.STRING
     },
+
+    color: {
+        type: sequelize.STRING,
+        defaultValue: "white"
+    }
 }, {timestamps: false})
 
 async function getUser(filter={}) {
     return User.findOne({where: filter})
 }
 
-async function getAllUsers() {
-    return User.findAll()
+async function getAllUsers(admin=true) {
+    return User.findAll({where: {admin}})
 }
 
 module.exports = {

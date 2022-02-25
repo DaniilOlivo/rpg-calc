@@ -14,5 +14,14 @@ if __name__ == "__main__":
         "WIL": 10,
         "CHR": 10,
     }))
-    recordChar = Character(name="Барак", pickle=pickle.dumps(barak))
-    recordChar.save()
+    kochan = player.Player("Чан Кочан", "Человек", player.CharTable({
+        "STR": 8,
+        "END": 10,
+        "AGL": 16,
+        "REF": 15,
+        "INT": 10,
+        "WIL": 15,
+        "CHR": 7,
+    }))
+    Character(name="Барак", pickle=pickle.dumps(barak)).save()
+    Character(name="Чан Кочан", pickle=pickle.dumps(kochan)).save()
