@@ -30,12 +30,19 @@ class Socket {
         if (!user) user = this.journalWs.getUser(this.ws)
         Socket.logger("Get character " + user.username)
         let dataChar = await callCore("GET", user.character)
+        dataChar.color = user.color
         this.send({package: dataChar})
     }
 
     async getAllDataCore() {
-        let users = await getAllUsers()
-        this.getDataCore(users[0])
+        Socket.logger("Get all characters")
+        let data = {}
+        for (let user of await getAllUsers(false)) {
+            let dataChar = await callCore("GET", user.character)
+            dataChar.color = user.color
+            data[user.character] = dataChar
+        }
+        this.send({package: data})
     }
 
     dispatcher(packageWs) {
