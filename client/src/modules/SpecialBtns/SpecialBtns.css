@@ -64,3 +64,43 @@
     font-size: 18px;
     cursor: pointer;
   }
+
+  /* Выбор цвета */
+.btn-special-funcions__marker {
+  padding: 8px;
+}
+
+.pick-color__title {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.pick-color__panel {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.pick-color__btn {
+  width: 50px;
+  height: 50px;
+
+  padding: 8px;
+  border-radius: 8px;
+
+  background-color: rgb(10, 10, 10);
+  opacity: 0.8;
+
+  margin: 0 10px 20px;
+
+  transition: 1s all;
+}
+
+.pick-color__btn:hover {
+  transform: rotate(360deg);
+}
+
+.marker {
+  width: 100%;
+  height: 100%;
+}
