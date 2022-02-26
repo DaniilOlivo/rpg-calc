@@ -3,6 +3,11 @@ import React from "react"
 import menuImage from "./img/menu.png"
 import "./SpecialBtns.css"
 
+import { connect, Provider } from "react-redux"
+import store from "../Redux/store"
+import { getColor } from "../Redux/api"
+import socket from "../Socket/Socket"
+
 import versions from "../../data/versions-logs.json"
 
 // Абстрактный класс для кнопок использующих модальные окна
@@ -83,6 +88,41 @@ class BtnDev extends BtnModal {
     }
 }
 
+function PickColor(props) {
+    const colors = ["white", "yellow", "orange", "blue", "violet", "red", "black", "gray", "green"]
+    let btnsColors = []
+
+    for (let color of colors) {
+        btnsColors.push(<div className="pick-color__btn" onClick={e => socket.signalSetColor(color)}>
+                <div className="marker" style={{backgroundColor: color}}></div>
+            </div>)
+    }
+    return (
+        <div className="pick-color">
+            <p className="pick-color__title">Выбери свой цвет!</p>
+            <div className="pick-color__panel">
+                {btnsColors}
+            </div>
+        </div>
+    )
+}
+
+class BtnPickColor extends BtnModal {
+    componentDidMount() {
+        this.setState({content: < PickColor />})
+    }
+
+    render() {
+        let marker = <div className="marker" style={{backgroundColor: this.props.color}}></div>
+        return (
+            <div className="color">
+                 <button className="btn-special-funcions btn-special-funcions__marker" onClick={this.onClick}>{marker}</button>
+                 {this.getModal()}
+            </div>
+        )
+    }
+}
+
 // Кнопка админа
 function BtnAdminPanel(props) {
     return (
@@ -96,6 +136,10 @@ function PanelBtnsSpecial(props) {
     if (props.boolAdmin) {
         btns.push(< BtnDev key={1} />)
         btns.push(< BtnAdminPanel key={2} />)
+    } else {
+        let Wrap = connect((state) => state.toObject())(BtnPickColor)
+        let BtnPickColorView = <Provider store={store} key={3}>< Wrap /></Provider>
+        btns.push(BtnPickColorView)
     }
 
     return (

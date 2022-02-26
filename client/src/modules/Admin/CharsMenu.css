@@ -1,0 +1,40 @@
+.chars-menu {
+    position: absolute;
+    left: 0;
+    top: 15vh;
+}
+
+.chars-menu__btn {
+    background: url("img/charsMenuBtn.png");
+    background-repeat: no-repeat;
+    width: 213px;
+    height: 65px;
+
+    display: flex;
+
+    color: #F1BA87;
+
+    font-family: SeoulHangang;
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+.chars-menu__btn p {
+    padding: 15px;
+}
+
+.chars-menu__btn_selected {
+    background: url("img/selectedCharsMenuBtn.png");
+}
+
+.chars-menu__marker {
+    height: 56px;
+    width: 20px;
+
+    transition: all 200ms;
+}
+
+.chars-menu__btn:hover .chars-menu__marker {
+    width: 30px;
+}

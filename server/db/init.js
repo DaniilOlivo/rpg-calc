@@ -8,6 +8,7 @@ async function init() {
         character: "Эндрю Брант",
         avatar: "/media/Брант.jpg"
     })
+
     User.create({
         username: "Сергей",
         password: "UltraPassword",

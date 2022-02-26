@@ -23,19 +23,36 @@ class Socket {
     async register(username) {
         Socket.logger("Register " + username)
         await this.journalWs.addSocket(this.ws, username)
-        this.send({signal: "REGISTER"})
+        let user = await this.journalWs.getUser(this.ws)
+        this.send({signal: "REGISTER", admin: user.admin})
     }
 
     async getDataCore(user) {
         if (!user) user = this.journalWs.getUser(this.ws)
         Socket.logger("Get character " + user.username)
         let dataChar = await callCore("GET", user.character)
+        dataChar.color = user.color
         this.send({package: dataChar})
     }
 
     async getAllDataCore() {
-        let users = await getAllUsers()
-        this.getDataCore(users[0])
+        Socket.logger("Get all characters")
+        let data = {}
+        for (let user of await getAllUsers(false)) {
+            let dataChar = await callCore("GET", user.character)
+            dataChar.color = user.color
+            data[user.character] = dataChar
+        }
+        this.send({package: data, admin: true})
+    }
+
+    async setColor(color) {
+        let user = this.journalWs.getUser(this.ws)
+        user.color = color
+        await user.save()
+        let dataChar = await callCore("GET", user.character)
+        dataChar.color = user.color
+        this.send({package: dataChar})
     }
 
     dispatcher(packageWs) {
@@ -44,6 +61,7 @@ class Socket {
         if (signal === "REGISTER") this.register(packageWs.user)
         if (signal === "GET") this.getDataCore()
         if (signal === "GET_ALL") this.getAllDataCore()
+        if (signal === "SET_COLOR") this.setColor(packageWs.color)
     }
 }
 
