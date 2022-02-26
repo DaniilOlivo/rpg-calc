@@ -8,9 +8,7 @@ import AuthApp from './modules/Auth/Auth';
 import TabsControl from "./modules/Tabs/TabsControl"
 import CharsMenuView from './modules/Admin/CharsMenu';
 
-import Socket from './modules/Socket/Socket';
-import { setData } from './modules/Redux/api'
-import { setListChars } from './modules/Admin/redux/api'
+import socket from './modules/Socket/Socket';
 
 function Main(props) {
   let adminFunctions = null
@@ -59,13 +57,7 @@ class App extends React.Component {
   loadResourses = () => {
     this.setState({content: < LoadBox />})
     setTimeout(() => this.setState({content: <  Main admin={this.state.admin} />}), 10000)
-    this.socket = new Socket({
-      username: this.state.user,
-      admin: this.state.admin  
-    }, 
-    {
-      package: (this.state.admin) ? setListChars : setData
-    })
+    socket.signalRegister(this.state.user)
   }
 
   render() {

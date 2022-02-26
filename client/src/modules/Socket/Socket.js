@@ -1,15 +1,11 @@
+import { setData } from "../Redux/api"
+import { setListChars } from "../Admin/redux/api"
 
 const wsConnect = "ws://127.0.0.1:5500/ws/table"
 
 class Socket extends WebSocket {
-    constructor(user, handlers) {
+    constructor() {
         super(wsConnect)
-        this.user = user
-        this.handlers = handlers
-
-        this.onopen = (e) => {
-            this.signalRegister()
-        }
 
         this.onmessage = (e) => {
             let data = JSON.parse(e.data)
@@ -33,26 +29,34 @@ class Socket extends WebSocket {
         this.send({signal: "GET_ALL"})
     }
 
-    signalRegister() {
+    signalRegister(user) {
         let packageWs = {
             signal: "REGISTER",
-            user: this.user.username
+            user
         }
         this.send(packageWs)
     }
 
+    signalSetColor(color) {
+        this.send({signal: "SET_COLOR", color})
+    }
+
     dispatcher(data) {
         if (data.test) console.log(data.test)
-        if (data.logChat) this.handlers.logChat(data.logChat)
-        if (data.package) this.handlers.package(data.package)
+        if (data.package) {
+            if (data.admin) setListChars(data.package)
+            else setData(data.package)
+        }
         if (data.signal) {
             let signal = data.signal
             if (signal === "REGISTER") {
-                if (this.user.admin) this.signalGetAll()
+                if (data.admin) this.signalGetAll()
                 else this.signalGet()
             }
         }
     }
 }
 
-export default Socket
+const socket = new Socket()
+
+export default socket
