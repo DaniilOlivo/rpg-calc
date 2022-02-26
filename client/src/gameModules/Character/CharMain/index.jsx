@@ -1,9 +1,9 @@
-import Block from "../../../../components/Block";
+import Block from "../../components/Block";
 
-import CharParam from "./components/CharParam";
-import CharChars from "./components/CharChars";
-import CharEffects from "./components/CharEffects";
-import CharFeatures from "./components/CharFeatures";
+import CharParam from "./modules/CharParams";
+import CharChars from "./modules/CharChars";
+import CharEffects from "./modules/CharEffects";
+import CharFeatures from "./modules/CharFeatures";
 
 import "./CharMain.css"
 

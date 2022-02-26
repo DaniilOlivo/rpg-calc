@@ -1,14 +1,14 @@
 import './App.css';
 import React from 'react';
-import PanelBtnsSpecial from './modules/SpecialBtns/SpecialBtns';
+import PanelBtnsSpecial from './SpecialBtns';
 
 import LoadBox from './components/LoadBox';
-import AuthApp from './modules/Auth/Auth';
+import AuthApp from './Auth';
 
-import TabsControl from "./modules/Tabs/TabsControl"
-import CharsMenuView from './modules/Admin/CharsMenu';
+import TabsControl from "./Tabs/TabsControl"
+import CharsMenuView from './Admin/CharsMenu';
 
-import socket from './modules/Socket/Socket';
+import socket from './Socket';
 
 function Main(props) {
   let adminFunctions = null

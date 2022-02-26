@@ -1,7 +1,7 @@
 import React from "react";
 import { Provider, connect } from "react-redux"
-import adminStore from "./redux/store";
-import { setChar } from "./redux/api"
+import adminStore from "../../Redux/admin/store";
+import { setChar } from "../../Redux/admin"
 
 import "./CharsMenu.css"
 

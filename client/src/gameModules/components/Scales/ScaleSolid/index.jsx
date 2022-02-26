@@ -1,6 +1,6 @@
 import React from "react";
 
-import "./Scale.css"
+import "../Scale.css"
 import "./ScaleSolid.css"
 
 class ScaleSolid extends React.Component {

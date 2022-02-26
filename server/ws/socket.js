@@ -22,26 +22,27 @@ class Socket {
 
     async register(username) {
         Socket.logger("Register " + username)
-        await this.journalWs.addSocket(this.ws, username)
-        let user = await this.journalWs.getUser(this.ws)
+        let user = await this.journalWs.addSocket(this.ws, username)
         this.send({signal: "REGISTER", admin: user.admin})
     }
 
     async getDataCore(user) {
-        if (!user) user = this.journalWs.getUser(this.ws)
-        Socket.logger("Get character " + user.username)
         let dataChar = await callCore("GET", user.character)
         dataChar.color = user.color
-        this.send({package: dataChar})
+        return dataChar
     }
 
-    async getAllDataCore() {
+    async get(user) {
+        if (!user) user = this.journalWs.getUser(this.ws)
+        Socket.logger("Get character " + user.username)
+        this.send({package: await this.getDataCore(user)})
+    }
+
+    async getAll() {
         Socket.logger("Get all characters")
         let data = {}
         for (let user of await getAllUsers(false)) {
-            let dataChar = await callCore("GET", user.character)
-            dataChar.color = user.color
-            data[user.character] = dataChar
+            data[user.character] = await this.getDataCore(user)
         }
         this.send({package: data, admin: true})
     }
@@ -50,17 +51,15 @@ class Socket {
         let user = this.journalWs.getUser(this.ws)
         user.color = color
         await user.save()
-        let dataChar = await callCore("GET", user.character)
-        dataChar.color = user.color
-        this.send({package: dataChar})
+        this.send({package: await this.getDataCore(user)})
     }
 
     dispatcher(packageWs) {
         let signal = packageWs.signal
         if (signal === "PING") this.pingPong()
         if (signal === "REGISTER") this.register(packageWs.user)
-        if (signal === "GET") this.getDataCore()
-        if (signal === "GET_ALL") this.getAllDataCore()
+        if (signal === "GET") this.get()
+        if (signal === "GET_ALL") this.getAll()
         if (signal === "SET_COLOR") this.setColor(packageWs.color)
     }
 }

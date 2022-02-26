@@ -1,6 +1,7 @@
-import { setData } from "../../Redux/api"
+import { setData } from ".."
 import adminStore from "./store"
-import { setPackage } from "../../Redux/actions"
+
+import { setPackage } from "../actions"
 
 export function setListChars(mapData) {
     adminStore.dispatch(setPackage(mapData))

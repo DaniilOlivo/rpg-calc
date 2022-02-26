@@ -1,5 +1,5 @@
-import { setData } from "../Redux/api"
-import { setListChars } from "../Admin/redux/api"
+import { setData } from "../Redux"
+import { setListChars } from "../Redux/admin"
 
 const wsConnect = "ws://127.0.0.1:5500/ws/table"
 

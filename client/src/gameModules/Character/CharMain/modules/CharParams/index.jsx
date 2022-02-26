@@ -1,7 +1,7 @@
 import "./CharParam.css"
 
-import ScaleSolid from "../../../../../components/Scales/ScaleSolid"
-import ScaleSegment from "../../../../../components/Scales/ScaleSegment"
+import ScaleSolid from "../../../../components/Scales/ScaleSolid"
+import ScaleSegment from "../../../../components/Scales/ScaleSegment"
 
 function CharParam(props) {
     return (

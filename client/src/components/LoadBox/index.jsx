@@ -1,7 +1,7 @@
 import React from "react"
 
-import tips from "../data/tips-load.json"
-import loadImage from "../img/load.png"
+import tips from "./tips-load.json"
+import loadImage from "./load.png"
 import "./LoadBox.css"
 
 function LoadBox(props) {

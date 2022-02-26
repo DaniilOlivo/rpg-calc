@@ -1,14 +1,13 @@
-import ModalWindow from "../../components/ModalWindow"
+import ModalWindow from "../components/ModalWindow"
 import React from "react"
 import menuImage from "./img/menu.png"
 import "./SpecialBtns.css"
 
 import { connect, Provider } from "react-redux"
 import store from "../Redux/store"
-import { getColor } from "../Redux/api"
-import socket from "../Socket/Socket"
+import socket from "../Socket"
 
-import versions from "../../data/versions-logs.json"
+import versions from "../data/versions-logs.json"
 
 // Абстрактный класс для кнопок использующих модальные окна
 // Потому что в санном JS нет нормальной реализации миксинов
