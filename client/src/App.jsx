@@ -63,7 +63,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="wrap">
-        < PanelBtnsSpecial boolAdmin={this.state.admin} />
+        < PanelBtnsSpecial boolUser={this.state.user} boolAdmin={this.state.admin} />
         { this.state.content }
       </div>
     )

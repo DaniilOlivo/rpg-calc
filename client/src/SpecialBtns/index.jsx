@@ -21,10 +21,14 @@ class BtnModal extends React.Component {
         this.setState({modal: true})
     }
 
+    closeModal = (e) => {
+        this.setState({modal: false})
+    }
+
     getModal() {
         let modal = null
         if (this.state.modal) {
-            modal = < ModalWindow content={this.state.content} parent={this} />
+            modal = < ModalWindow content={this.state.content} onClick={this.closeModal} />
         }
 
         return modal
@@ -80,7 +84,7 @@ class BtnDev extends BtnModal {
     render() {
         return (
             <div className="dev">
-                <button className="btn-special-funcions" onClick={this.onClick}>dev</button>
+                <button className="btn-special-funcions" onClick={this.onClick}>func</button>
                 {this.getModal()}
             </div>
         )
@@ -91,10 +95,13 @@ function PickColor(props) {
     const colors = ["white", "yellow", "orange", "blue", "violet", "red", "black", "gray", "green"]
     let btnsColors = []
 
+    let count = 0
+
     for (let color of colors) {
-        btnsColors.push(<div className="pick-color__btn" onClick={e => socket.signalSetColor(color)}>
+        btnsColors.push(<div className="pick-color__btn" onClick={e => socket.signalSetColor(color)} key={count}>
                 <div className="marker" style={{backgroundColor: color}}></div>
             </div>)
+        count++
     }
     return (
         <div className="pick-color">
@@ -122,23 +129,19 @@ class BtnPickColor extends BtnModal {
     }
 }
 
-// Кнопка админа
-function BtnAdminPanel(props) {
-    return (
-        <button className="btn-special-funcions" onClick={(e) => console.log("У нас нет админки :(")}>db</button>
-    )
-}
-
 // Панель кнопок
 function PanelBtnsSpecial(props) {
-    let btns = [< BtnLog key={0}/>]
-    if (props.boolAdmin) {
-        btns.push(< BtnDev key={1} />)
-        btns.push(< BtnAdminPanel key={2} />)
-    } else {
+    let btns = [
+        < BtnLog key="log"/>,
+        < BtnDev key="func" />
+    ]
+
+    if (props.boolUser && !props.boolAdmin) {
         let Wrap = connect((state) => state.toObject())(BtnPickColor)
-        let BtnPickColorView = <Provider store={store} key={3}>< Wrap /></Provider>
-        btns.push(BtnPickColorView)
+        let btnColor = <Provider store={store} key="color">
+            < Wrap />
+        </Provider>
+        btns.push(btnColor)
     }
 
     return (
