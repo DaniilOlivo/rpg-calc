@@ -1,0 +1,110 @@
+/* Кнопки специальных функций */
+.panel-btns-special {
+    position: fixed;
+    right: 0;
+    top: 0;
+    z-index: 10;
+  
+    display: flex;
+  }
+  
+  .btn-special-funcions {
+    width: 50px;
+    height: 50px;
+  
+    border: none;
+    border-radius: 5px;
+  
+    margin-top: 10px;
+    margin-right: 5px;
+  
+    background-color: rgb(10, 10, 10);
+  
+    transition: all 200ms;
+    opacity: 0.8;
+  
+    color: white;
+    font-size: 18px;
+  }
+  
+  .btn-special-funcions:hover {
+    transform: scale(1.1, 1.1);
+    opacity: 1;
+  }
+  
+  .log-version__img {
+    width: 40px;
+    height: 40px;
+  }
+  
+  /* Логи */
+  .logs__title {
+    margin-top: 20px;
+  }
+
+  .logs__title::after, .logs__title::before {
+    content: "--";
+  }
+  
+  .logs__list-changes li {
+    margin-left: 50px;
+  }
+  
+  /* Функции разработчика */
+  .dev-func-block {
+    width: 100%;
+    
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .dev-func__btn {
+    border: solid white 1px;
+    border-radius: 10px;
+    padding: 10px 20px;
+    background-color: transparent;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  /* Выбор цвета */
+.btn-special-funcions__marker {
+  padding: 8px;
+}
+
+.pick-color__title {
+  text-align: center;
+  font-size: 26px;
+  margin-bottom: 20px;
+}
+
+.pick-color__panel {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.pick-color__btn {
+  width: 50px;
+  height: 50px;
+
+  padding: 8px;
+  border-radius: 8px;
+
+  background-color: rgb(10, 10, 10);
+  opacity: 0.8;
+
+  margin: 0 10px 20px;
+
+  transition: 1s all;
+}
+
+.pick-color__btn:hover {
+  transform: rotate(360deg);
+}
+
+.marker {
+  width: 100%;
+  height: 100%;
+}
