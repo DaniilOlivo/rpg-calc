@@ -1,6 +1,6 @@
 import { createStore } from "redux"
-import reducer from "../reducer"
+import reducerAdmin from "./reducer"
 
-const adminStore = createStore(reducer)
+const adminStore = createStore(reducerAdmin)
 
 export default adminStore

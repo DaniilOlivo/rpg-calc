@@ -38,6 +38,10 @@
   }
   
   /* Логи */
+  .logs__title {
+    margin-top: 20px;
+  }
+
   .logs__title::after, .logs__title::before {
     content: "--";
   }

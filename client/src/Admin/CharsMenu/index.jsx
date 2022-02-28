@@ -1,6 +1,7 @@
 import React from "react";
 import { Provider, connect } from "react-redux"
 import adminStore from "../../Redux/admin/store";
+import { setCurrent } from "../../Redux/admin/actions";
 import { setChar } from "../../Redux/admin"
 
 import "./CharsMenu.css"
@@ -19,23 +20,23 @@ function MenuBtn(props) {
 }
 
 class CharsMenu extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {currentCharIndex: 0}
-    }
+    onClick = (char) => {
+        this.props.setCurrent(char)
+        setChar()
+    } 
 
     render() {
-        setChar(this.props.chars[this.state.currentCharIndex].nameChar)
+        let currentChar = this.props.currentChar
         let arrBtns = []
         for (let i = 0; i < this.props.chars.length; i++) {
             let char = this.props.chars[i]
-            let selected = i == this.state.currentCharIndex
+            let selected = char.packageChar === currentChar
             arrBtns.push(< MenuBtn 
                 title={char.nameChar}
                 colorMarker={char.color}
                 selected={selected}
                 key={i}
-                onClick={(e) => this.setState({currentCharIndex: i})} />)
+                onClick={(e) => this.onClick(char.packageChar)} />)
         }
 
         return (
@@ -47,17 +48,23 @@ class CharsMenu extends React.Component {
 }
 
 function mapStateToProps(state) {
-    let mapObj = {chars: []}
-    state.forEach((packageChar, nameChar) => {
-        mapObj.chars.push({
+    let mapProps = {
+        "chars": [],
+        "currentChar": state.get("currentChar")
+    }
+    let chars = state.get("chars")
+    for (let [nameChar, packageChar] of Object.entries(chars)) {
+        mapProps.chars.push({
             nameChar,
-            color: packageChar.color
+            color: packageChar.color,
+            packageChar
         })
-    })
-    return mapObj
+    }
+
+    return mapProps
 }
 
-let Wrap = connect(mapStateToProps)(CharsMenu)
+let Wrap = connect(mapStateToProps, {setCurrent})(CharsMenu)
 let CharsMenuView = <Provider store={adminStore} >< Wrap /></Provider>
 
 export default CharsMenuView
