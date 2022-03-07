@@ -51,7 +51,11 @@ class Socket {
         let user = this.journalWs.getUser(this.ws)
         user.color = color
         await user.save()
-        this.send({package: await this.getDataCore(user)})
+        let updateChar = await this.getDataCore(user)
+        this.send({package: updateChar})
+        
+        let socketAdmin = this.journalWs.getSocketAdmin()
+        if (socketAdmin) socketAdmin.ws.send({package: updateChar, update: user.character})
     }
 
     dispatcher(packageWs) {
