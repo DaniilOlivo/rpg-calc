@@ -16,12 +16,13 @@ wsRouter.ws("/table", (ws, req) => {
     
     let liveConnect = true
 
-    setInterval(() => {
+    let pulseTimer = setInterval(() => {
         ws.ping()
         liveConnect = false
         setTimeout(() => {
             if (!liveConnect) {
                 Socket.logger("Client died")
+                clearInterval(pulseTimer)
                 ws.close()
             }
         }, 30*1000)
