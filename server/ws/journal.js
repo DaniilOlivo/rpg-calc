@@ -12,6 +12,10 @@ class Journal extends Array {
         return socket.user
     }
 
+    getSocketAdmin() {
+        return this.find(socket => socket.user.admin)
+    }
+
     removeSocket(ws) {
         let socketIndex = this.findIndex(socket => socket.ws === ws)
         this.splice(socketIndex, 1)

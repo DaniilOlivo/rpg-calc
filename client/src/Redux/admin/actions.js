@@ -11,3 +11,11 @@ export function setChars(chars) {
         chars
     }
 }
+
+export function updateChar(charname, charData) {
+    return {
+        type: "UPDATE_CHAR",
+        charname,
+        charData,
+    }
+}
