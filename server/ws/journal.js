@@ -12,8 +12,10 @@ class Journal extends Array {
         return socket.user
     }
 
-    getSocketAdmin() {
-        return this.find(socket => socket.user.admin)
+    getWSAdmin() {
+        let record = this.find(socket => socket.user.admin)
+        if (record) return record.ws
+        else return null 
     }
 
     removeSocket(ws) {
