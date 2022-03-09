@@ -1,5 +1,5 @@
 import { setData } from "../Redux"
-import { setListChars, updateDataChar } from "../Redux/admin"
+import { setListChars } from "../Redux/admin"
 
 const wsConnect = "ws://127.0.0.1:5500/ws/table"
 
@@ -44,8 +44,7 @@ class Socket extends WebSocket {
     dispatcher(data) {
         if (data.test) console.log(data.test)
         if (data.package) {
-            if (data.admin) setListChars(data.package)
-            else if (data.update) updateDataChar(data.update, data.package)
+            if (data.character) setListChars(data.character, data.package)
             else setData(data.package)
         }
         if (data.signal) {

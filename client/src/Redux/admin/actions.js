@@ -5,16 +5,9 @@ export function setCurrent(char) {
     }
 }
 
-export function setChars(chars) {
+export function setCharList(charname, charData) {
     return {
-        type: "SET_CHARS",
-        chars
-    }
-}
-
-export function updateChar(charname, charData) {
-    return {
-        type: "UPDATE_CHAR",
+        type: "SET_CHAR",
         charname,
         charData,
     }

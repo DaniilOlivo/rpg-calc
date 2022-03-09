@@ -1,16 +1,15 @@
 import { setData } from ".."
 import adminStore from "./store"
-import { setChars, setCurrent, updateChar } from "./actions"
+import { setCharList, setCurrent } from "./actions"
 
-export function setListChars(mapData) {
-    adminStore.dispatch(setChars(mapData))
-    let defaultChar = Object.values(mapData)[0]
-    adminStore.dispatch(setCurrent(defaultChar))
-    setChar()
-}
-
-export function updateDataChar(charname, charData) {
-    adminStore.dispatch(updateChar(charname, charData))
+export function setListChars(charname, charData) {
+    adminStore.dispatch(setCharList(charname, charData))
+    let state = adminStore.getState()
+    let listChars = Object.values(state.get("chars"))
+    if (listChars.length === 1) {
+        adminStore.dispatch(setCurrent(listChars[0]))
+        setChar()
+    }
 }
 
 export function setChar() {
