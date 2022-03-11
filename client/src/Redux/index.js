@@ -1,6 +1,10 @@
 import store from "./store";
-import { setPackage } from "./actions"
+import { actionSetCharData, actionPushLog } from "./actions"
 
-export function setData(data) {
-    store.dispatch(setPackage(data))
+export function setCharData(charData) {
+    store.dispatch(actionSetCharData(charData))
+}
+
+export function pushLog(message) {
+    store.dispatch(actionPushLog(message))
 }

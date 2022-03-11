@@ -1,6 +1,13 @@
-export function setPackage(data) {
+export function actionSetCharData(charData) {
     return {
-        type: "SET",
-        data
+        type: "SET_CHAR",
+        charData
+    }
+}
+
+export function actionPushLog(message) {
+    return {
+        type: "PUSH_LOG",
+        message
     }
 }

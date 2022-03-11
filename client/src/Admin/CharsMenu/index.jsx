@@ -53,7 +53,7 @@ function mapStateToProps(state) {
         "currentChar": state.get("currentChar")
     }
     let chars = state.get("chars")
-    for (let [nameChar, packageChar] of Object.entries(chars)) {
+    for (let [nameChar, packageChar] of chars.entries()) {
         mapProps.chars.push({
             nameChar,
             color: packageChar.color,

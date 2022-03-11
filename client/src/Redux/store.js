@@ -1,11 +1,12 @@
 import { createStore } from "redux"
 import reducer from "./reducer"
-import { Map } from "immutable"
+import { Map, List } from "immutable"
 
-let domains = new Map({
-    "charMain": {}
+let initState = new Map({
+    "char": {},
+    "log": List()
 })
 
-const store = createStore(reducer, domains)
+const store = createStore(reducer, initState)
 
 export default store

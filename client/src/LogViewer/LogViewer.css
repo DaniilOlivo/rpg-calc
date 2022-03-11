@@ -1,12 +1,14 @@
-.log-viewer {
-    position: fixed;
-    right: 0;
-    top: 50%;
-    margin-top: -150px;
+.log {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  margin-top: -150px;
+}
 
+.log-viewer {
     width: 200px;
     height: 300px;
-  
+
     border: none;
     border-radius: 10px;
   
@@ -16,4 +18,42 @@
     font-size: 16px;
   
     padding: 10px;
+
+    display: flex;
+    flex-direction: column;
+
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+
+  .log-viewer::-webkit-scrollbar {
+    width: 0;
+  }
+
+  .log-input {
+    width: 200px;
+
+    border: none;
+    border-radius: 5px;
+  
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+  
+    font-size: 16px;
+
+    padding: 5px 15px;
+    margin-top: 10px;
+  }
+
+  .log-viewer__from {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+
+  .log-viewer__from_message::after {
+    content: ":";
+  }
+
+  .log-viewer__message_system {
+    text-transform: lowercase;
   }

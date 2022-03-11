@@ -1,11 +1,12 @@
-import { setData } from ".."
+import { setCharData } from ".."
 import adminStore from "./store"
 import { setCharList, setCurrent } from "./actions"
 
 export function setListChars(charname, charData) {
     adminStore.dispatch(setCharList(charname, charData))
     let state = adminStore.getState()
-    let listChars = Object.values(state.get("chars"))
+    let chars = state.get("chars").toObject()
+    let listChars = Object.values(chars)
     if (listChars.length === 1) {
         adminStore.dispatch(setCurrent(listChars[0]))
         setChar()
@@ -14,5 +15,5 @@ export function setListChars(charname, charData) {
 
 export function setChar() {
     let state = adminStore.getState()
-    setData(state.get("currentChar"))
+    setCharData(state.get("currentChar"))
 }

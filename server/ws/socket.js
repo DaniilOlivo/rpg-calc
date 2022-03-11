@@ -1,5 +1,6 @@
 const python = require("../python_api")
 const userDB = require("../db").user
+const log = require("./log")
 
 class Socket {
     constructor(ws, journalWs) {
@@ -33,6 +34,15 @@ class Socket {
         Socket.logger("Register " + username)
         let user = await this.journalWs.addSocket(this.ws, username)
         this.send({signal: "REGISTER", admin: user.admin})
+        this.send(log.packageMesHello(username))
+    }
+
+    broadcast(message) {
+        for (let { ws, user } of this.journalWs) {
+            let username = user.username
+            let packageWs = JSON.stringify(log.packageMes(username, message))
+            ws.send(packageWs) 
+        }
     }
 
     async getDataCore(user) {
@@ -70,6 +80,14 @@ class Socket {
         if (signal === "GET") this.get()
         if (signal === "GET_ALL") this.getAll()
         if (signal === "SET_COLOR") this.setColor(packageWs.color)
+        if (signal === "MESSAGE") this.broadcast(packageWs.message)
+    }
+
+    close() {
+        Socket.logger("Close")
+        let user = this.journalWs.getUser(this.ws)
+        this.send(log.packageMesGoodbye(user.username))
+        this.journalWs.removeSocket(this.ws)
     }
 }
 

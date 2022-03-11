@@ -4,6 +4,7 @@ import PanelBtnsSpecial from './SpecialBtns';
 
 import LoadBox from './components/LoadBox';
 import AuthApp from './Auth';
+import LogViewer from './LogViewer';
 
 import TabsControl from "./Tabs/TabsControl"
 import CharsMenuView from './Admin/CharsMenu';
@@ -18,6 +19,9 @@ function Main(props) {
   return (
     <main>
       < TabsControl />
+      <div className="log-container">
+        {LogViewer}
+      </div>
       {adminFunctions}
     </main>
   )

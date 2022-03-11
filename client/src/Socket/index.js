@@ -1,4 +1,4 @@
-import { setData } from "../Redux"
+import { setCharData, pushLog } from "../Redux"
 import { setListChars } from "../Redux/admin"
 
 const wsConnect = "ws://127.0.0.1:5500/ws/table"
@@ -41,12 +41,18 @@ class Socket extends WebSocket {
         this.send({signal: "SET_COLOR", color})
     }
 
+    sendMessage(message) {
+        this.send({signal: "MESSAGE", message})
+    }
+
     dispatcher(data) {
+        console.log(data)
         if (data.test) console.log(data.test)
         if (data.package) {
             if (data.character) setListChars(data.character, data.package)
-            else setData(data.package)
+            else setCharData(data.package)
         }
+        if (data.message) pushLog(data)
         if (data.signal) {
             let signal = data.signal
             if (signal === "REGISTER") {

@@ -19,8 +19,7 @@ wsRouter.ws("/table", (ws, req) => {
     })
 
     ws.on("close", () => {
-        Socket.logger("Close")
-        journalWs.removeSocket(ws)
+        socket.close()
     })
 })
 
