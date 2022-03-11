@@ -1,5 +1,6 @@
-const callCore = require("../python_api").callCore
-const { getAllUsers } = require("../db").user
+const python = require("../python_api")
+const userDB = require("../db").user
+const log = require("./log")
 
 class Socket {
     constructor(ws, journalWs) {
@@ -15,6 +16,15 @@ class Socket {
         this.ws.send(JSON.stringify(data))
     }
 
+    async sendAdmin(user) {
+        const packageWs = JSON.stringify({
+            character: user.character,
+            package: await this.getDataCore(user)
+        })
+        let wsAdmin = this.journalWs.getWSAdmin()
+        if (wsAdmin) wsAdmin.send(packageWs)
+    }
+
     pingPong() {
         Socket.logger("Test connection")
         this.send({signal: "PONG"})
@@ -24,10 +34,19 @@ class Socket {
         Socket.logger("Register " + username)
         let user = await this.journalWs.addSocket(this.ws, username)
         this.send({signal: "REGISTER", admin: user.admin})
+        this.send(log.packageMesHello(username))
+    }
+
+    broadcast(message) {
+        for (let { ws, user } of this.journalWs) {
+            let username = user.username
+            let packageWs = JSON.stringify(log.packageMes(username, message))
+            ws.send(packageWs) 
+        }
     }
 
     async getDataCore(user) {
-        let dataChar = await callCore("GET", user.character)
+        let dataChar = await python.callCore("GET", user.character)
         dataChar.color = user.color
         return dataChar
     }
@@ -40,11 +59,9 @@ class Socket {
 
     async getAll() {
         Socket.logger("Get all characters")
-        let data = {}
-        for (let user of await getAllUsers(false)) {
-            data[user.character] = await this.getDataCore(user)
+        for (let user of await userDB.getAllUsers(false)) {
+            await this.sendAdmin(user)
         }
-        this.send({package: data, admin: true})
     }
 
     async setColor(color) {
@@ -53,9 +70,7 @@ class Socket {
         await user.save()
         let updateChar = await this.getDataCore(user)
         this.send({package: updateChar})
-        
-        let socketAdmin = this.journalWs.getSocketAdmin()
-        if (socketAdmin) socketAdmin.ws.send({package: updateChar, update: user.character})
+        await this.sendAdmin(user)
     }
 
     dispatcher(packageWs) {
@@ -65,6 +80,14 @@ class Socket {
         if (signal === "GET") this.get()
         if (signal === "GET_ALL") this.getAll()
         if (signal === "SET_COLOR") this.setColor(packageWs.color)
+        if (signal === "MESSAGE") this.broadcast(packageWs.message)
+    }
+
+    close() {
+        Socket.logger("Close")
+        let user = this.journalWs.getUser(this.ws)
+        this.send(log.packageMesGoodbye(user.username))
+        this.journalWs.removeSocket(this.ws)
     }
 }
 

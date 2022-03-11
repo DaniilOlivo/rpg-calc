@@ -32,6 +32,17 @@ describe("Аутентификация", () => {
             .end(done)
     })
 
+    it("Выход пользователя", (done) => {
+        agent_1.post("/auth/logout").end(() => {
+            agent_1.get("/auth/user")
+            .expect(200, {
+                user: false
+            })
+            .end(done)
+        })
+        
+    })
+
     it("Отклоненная авторизация", (done) => {
         test(app).post("/auth/login")
             .send({username: "Армен", password: "Pass"})

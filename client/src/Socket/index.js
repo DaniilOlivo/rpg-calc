@@ -1,5 +1,5 @@
-import { setData } from "../Redux"
-import { setListChars, updateDataChar } from "../Redux/admin"
+import { setCharData, pushLog } from "../Redux"
+import { setListChars } from "../Redux/admin"
 
 const wsConnect = "wss://rpg-calc.herokuapp.com/ws/table"
 
@@ -41,13 +41,18 @@ class Socket extends WebSocket {
         this.send({signal: "SET_COLOR", color})
     }
 
+    sendMessage(message) {
+        this.send({signal: "MESSAGE", message})
+    }
+
     dispatcher(data) {
+        console.log(data)
         if (data.test) console.log(data.test)
         if (data.package) {
-            if (data.admin) setListChars(data.package)
-            else if (data.update) updateDataChar(data.update, data.package)
-            else setData(data.package)
+            if (data.character) setListChars(data.character, data.package)
+            else setCharData(data.package)
         }
+        if (data.message) pushLog(data)
         if (data.signal) {
             let signal = data.signal
             if (signal === "REGISTER") {

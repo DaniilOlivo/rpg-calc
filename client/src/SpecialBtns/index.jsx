@@ -92,7 +92,12 @@ class BtnDev extends BtnModal {
 }
 
 function PickColor(props) {
-    const colors = ["white", "yellow", "orange", "blue", "violet", "red", "black", "gray", "green"]
+    const colors = ["white", "yellow", "orange", "blue", "violet",
+        "red", "black", "gray", "green", "purple",
+        "lime", "crimson", "darkred", "pink", "magenta",
+        "indigo", "darkgreen", "olive", "cyan", "navy",
+        "wheat", "chocolate", "maroon",
+    ]
     let btnsColors = []
 
     let count = 0
@@ -137,7 +142,10 @@ function PanelBtnsSpecial(props) {
     ]
 
     if (props.boolUser && !props.boolAdmin) {
-        let Wrap = connect((state) => state.toObject())(BtnPickColor)
+        let mapStateToProps = (state) => {
+            return {color: state.get("char").color}
+        }
+        let Wrap = connect(mapStateToProps)(BtnPickColor)
         let btnColor = <Provider store={store} key="color">
             < Wrap />
         </Provider>

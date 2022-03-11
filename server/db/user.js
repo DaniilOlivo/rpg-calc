@@ -37,7 +37,11 @@ async function getUser(filter={}) {
 }
 
 async function getAllUsers(admin=true) {
-    return User.findAll({where: {admin}})
+    if (!admin) {
+        return User.findAll({where: {admin}})
+    }
+    return User.findAll()
+    
 }
 
 module.exports = {

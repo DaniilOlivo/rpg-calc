@@ -3,7 +3,6 @@ const ws = require("express-ws")
 
 const Journal = require("./journal")
 const Socket = require("./socket")
-const callCore = require("../python_api").callCore
 
 const wsRouter = express.Router()
 ws(wsRouter)
@@ -36,8 +35,7 @@ wsRouter.ws("/table", (ws, req) => {
     })
 
     ws.on("close", () => {
-        Socket.logger("Close")
-        journalWs.removeSocket(ws)
+        socket.close()
     })
 })
 
