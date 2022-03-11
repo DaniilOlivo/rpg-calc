@@ -35,6 +35,7 @@ wsRouter.ws("/table", (ws, req) => {
     })
 
     ws.on("close", () => {
+        clearInterval(pulseTimer)
         socket.close()
     })
 })
