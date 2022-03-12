@@ -34,14 +34,12 @@ class Socket {
         Socket.logger("Register " + username)
         let user = await this.journalWs.addSocket(this.ws, username)
         this.send({signal: "REGISTER", admin: user.admin})
-        this.send(log.packageMesHello(username))
+        this.broadcast(log.packageMesHello(username))
     }
 
-    broadcast(message) {
-        for (let { ws, user } of this.journalWs) {
-            let username = user.username
-            let packageWs = JSON.stringify(log.packageMes(username, message))
-            ws.send(packageWs) 
+    broadcast(packageWs) {
+        for (let { ws } of this.journalWs) {
+            ws.send(JSON.stringify(packageWs)) 
         }
     }
 
@@ -73,6 +71,11 @@ class Socket {
         await this.sendAdmin(user)
     }
 
+    message(message) {
+        let username = this.journalWs.getUser(this.ws).username
+        this.broadcast(log.packageMes(username, message))
+    }
+
     dispatcher(packageWs) {
         let signal = packageWs.signal
         if (signal === "PING") this.pingPong()
@@ -80,13 +83,13 @@ class Socket {
         if (signal === "GET") this.get()
         if (signal === "GET_ALL") this.getAll()
         if (signal === "SET_COLOR") this.setColor(packageWs.color)
-        if (signal === "MESSAGE") this.broadcast(packageWs.message)
+        if (signal === "MESSAGE") this.message(packageWs.message)
     }
 
     close() {
         Socket.logger("Close")
         let user = this.journalWs.getUser(this.ws)
-        this.send(log.packageMesGoodbye(user.username))
+        this.broadcast(log.packageMesGoodbye(user.username))
         this.journalWs.removeSocket(this.ws)
     }
 }
