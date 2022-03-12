@@ -44,18 +44,25 @@ describe("Cигналы", () => {
         getUserStub = sinon.stub(user, "getUser")
         getAllUsersStub = sinon.stub(user, "getAllUsers")
         callCoreStub = sinon.stub(python, "callCore")
-    
-        getUserStub.returns(Promise.resolve(fakeDbUsers["Поркчоп"]))
-        getAllUsersStub.returns(Promise.resolve([fakeDbUsers["Поркчоп"], fakeDbUsers["Чан Кочан"]]))
-        callCoreStub.returns(Promise.resolve(fakeChar))
     })
     
     let getTestSocket = (spy, journal=new Journal()) => new Socket({send: spy}, journal)
 
+    let initSocket = async (socket, username, spy=null) => {
+        getUserStub.returns(Promise.resolve(fakeDbUsers[username]))
+        await socket.register(username)
+
+        if (spy) {
+            spy.resetHistory()
+        }
+    }
+
+    let getPacakge = (spy, index=0) => JSON.parse(spy.getCall(index).firstArg)
+
     function clearStubs() {
-        getUserStub.resetHistory()
-        getAllUsersStub.resetHistory()
-        callCoreStub.resetHistory()
+        getUserStub.reset()
+        getAllUsersStub.reset()
+        callCoreStub.reset()
     }
 
     describe("REGISTER", () => {
@@ -63,15 +70,21 @@ describe("Cигналы", () => {
 
         before(async () => {
             let socket = getTestSocket(wsSpy)
-            await socket.register("Поркчоп")
+            await initSocket(socket, "Поркчоп")
         })
 
         it("Подтверждение регистрации", () => {
-            const expectPacakge = JSON.stringify({
+            const expectPacakge = {
                 signal: "REGISTER",
                 admin: false
-            })
-            assert.equal(wsSpy.firstCall.firstArg, expectPacakge)
+            }
+            assert.deepEqual(getPacakge(wsSpy), expectPacakge)
+        })
+
+        it("Сообщение о присоединении", () => {
+            let packageWs = getPacakge(wsSpy, 1)
+            assert.equal(packageWs.type, "HELLO")
+            assert.equal(packageWs.from, "Поркчоп")
         })
 
         it("Обращение к базе данных", () => {
@@ -87,10 +100,13 @@ describe("Cигналы", () => {
         let wsSpy = sinon.spy()
 
         before(async () => {
+            callCoreStub.returns(Promise.resolve(fakeChar))
+
             let socket = getTestSocket(wsSpy)
-            await socket.register("Поркчоп")
+            await initSocket(socket, "Поркчоп", wsSpy)
             await socket.get()
-            packageWs = JSON.parse(wsSpy.secondCall.firstArg).package
+
+            packageWs = getPacakge(wsSpy).package
         })
 
         it("Ядро получило запрос", () => assert.equal(callCoreStub.firstCall.args[1], "Барак"))
@@ -106,29 +122,26 @@ describe("Cигналы", () => {
 
         let wsSpy = sinon.spy()
 
-        before(async () => {
-            getUserStub.returns(Promise.resolve(fakeDbUsers["Гачи Мастер"]))
+        before(async () => {        
+            getAllUsersStub.returns(Promise.resolve([fakeDbUsers["Поркчоп"], fakeDbUsers["Чан Кочан"]]))
+            callCoreStub.returns(Promise.resolve(fakeChar))
             
             let socket = getTestSocket(wsSpy) 
-
-            await socket.register("Гачи Мастер")
+            await initSocket(socket, "Гачи Мастер", wsSpy)
             await socket.getAll()
            
-            firstChar = JSON.parse(wsSpy.secondCall.firstArg)
-            secondChar = JSON.parse(wsSpy.thirdCall.firstArg)
+            firstChar = getPacakge(wsSpy, 0)
+            secondChar = getPacakge(wsSpy, 1)
         })
 
-        it("Количество персонажей", () => assert.equal(wsSpy.callCount, 3))
+        it("Количество персонажей", () => assert.equal(wsSpy.callCount, 2))
         it("Проверка меток", () => {
             assert.equal(firstChar.character, "Барак")
             assert.equal(secondChar.character, "Чан Кочан")
         })
         it("С персонажем все в порядке", () => assert.equal(firstChar.package.charMain.name, "Барак"))
 
-        after(() => {
-            clearStubs()
-            getUserStub.returns(Promise.resolve(fakeDbUsers["Поркчоп"]))
-        })
+        after(clearStubs)
     })
 
     describe("SET_COLOR", () => {
@@ -138,30 +151,68 @@ describe("Cигналы", () => {
         let packageUser
 
         before(async () => {
+            callCoreStub.returns(Promise.resolve(fakeChar))
+
             let journal = new Journal()
             let socketAdmin = getTestSocket(wsAdminSpy, journal)
             let socket = getTestSocket(wsSpy, journal)
 
-            await socket.register("Поркчоп")
-            getUserStub.returns(Promise.resolve(fakeDbUsers["Гачи Мастер"]))
-            await socketAdmin.register("Гачи Мастер")
+            await initSocket(socket, "Поркчоп")
+            await initSocket(socketAdmin, "Гачи Мастер")
+
+            wsSpy.resetHistory()
+            wsAdminSpy.resetHistory()
 
             await socket.setColor("green")
 
-            packageUser = JSON.parse(wsSpy.secondCall.firstArg).package
+            packageUser = getPacakge(wsSpy).package
         })
 
         it("У пользователя изменен цвет", () => assert.equal(packageUser.color, "green"))
         it("Пришел пакет админу", () => {
-            let adminMes = JSON.parse(wsAdminSpy.secondCall.firstArg)
+            let adminMes = getPacakge(wsAdminSpy)
             assert.equal(adminMes.character, "Барак")
             assert.equal(adminMes.package.color, "green")
         })
 
-        after(() => {
-            clearStubs()
-            getUserStub.returns(Promise.resolve(fakeDbUsers["Поркчоп"]))
+        after(clearStubs)
+    })
+
+    describe("MESSAGE", () => {
+        let spyOne = sinon.spy()
+        let spyTwo = sinon.spy()
+
+        let packageOne
+        let packageTwo
+
+        before(async () => {
+            let journal = new Journal()
+            let socketOne = getTestSocket(spyOne, journal)
+            let socketTwo = getTestSocket(spyTwo, journal)
+
+            await initSocket(socketOne, "Поркчоп")
+            await initSocket(socketTwo, "Чан Кочан")
+
+            spyOne.resetHistory()
+            spyTwo.resetHistory()
+
+            socketOne.message("Здарово!")
+
+            packageOne = getPacakge(spyOne)
+            packageTwo = getPacakge(spyTwo)
         })
+
+        it("Отправитель получил свое сообщение", () => {
+            assert.equal(packageOne.from, "Поркчоп")
+            assert.equal(packageOne.message, "Здарово!")
+        })
+
+        it("Другой чел получил сообщение", () => {
+            assert.equal(packageTwo.from, "Поркчоп")
+            assert.equal(packageTwo.message, "Здарово!")
+        })
+
+        after(clearStubs)
     })
 
     after(() => {
