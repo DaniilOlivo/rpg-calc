@@ -34,7 +34,7 @@ class Socket {
         Socket.logger("Register " + username)
         let user = await this.journalWs.addSocket(this.ws, username)
         this.send({signal: "REGISTER", admin: user.admin})
-        this.broadcast(log.packageMesHello(username))
+        this.broadcast(log.packageMesHello(user))
     }
 
     broadcast(packageWs) {
@@ -72,8 +72,8 @@ class Socket {
     }
 
     message(message) {
-        let username = this.journalWs.getUser(this.ws).username
-        this.broadcast(log.packageMes(username, message))
+        let user = this.journalWs.getUser(this.ws)
+        this.broadcast(log.packageMes(user, message))
     }
 
     dispatcher(packageWs) {
@@ -89,7 +89,7 @@ class Socket {
     close() {
         Socket.logger("Close")
         let user = this.journalWs.getUser(this.ws)
-        this.broadcast(log.packageMesGoodbye(user.username))
+        this.broadcast(log.packageMesGoodbye(user))
         this.journalWs.removeSocket(this.ws)
     }
 }

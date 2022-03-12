@@ -204,11 +204,13 @@ describe("Cигналы", () => {
 
         it("Отправитель получил свое сообщение", () => {
             assert.equal(packageOne.from, "Поркчоп")
+            assert.equal(packageOne.color, "green")
             assert.equal(packageOne.message, "Здарово!")
         })
 
         it("Другой чел получил сообщение", () => {
             assert.equal(packageTwo.from, "Поркчоп")
+            assert.equal(packageTwo.color, "green")
             assert.equal(packageTwo.message, "Здарово!")
         })
 

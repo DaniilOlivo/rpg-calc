@@ -19,15 +19,16 @@ class LogViewerComponent extends React.Component {
 
     render() {
         let arrRecords = []
-        let color = this.props.color
         
         for (let record of this.props.log) {
             let classNameFrom = "log-viewer__from"
             let classNameMes = "log-viewer__message"
+            let styleColor = {}
 
             if (record.type === "HELLO" || record.type === "GOODBYE") {
                 classNameFrom += " log-viewer__from_system"
                 classNameMes += " log-viewer__message_system"
+                styleColor.color = record.color
             }
 
             if (record.type === "MESSAGE") {
@@ -35,8 +36,8 @@ class LogViewerComponent extends React.Component {
             }
 
             arrRecords.push(<div className="log-viewer__record">
-                    <span className={classNameFrom} style={{color}}>{record.from}</span>
-                    <span className={classNameMes}>{record.message}</span>
+                    <span className={classNameFrom} style={{color: record.color}}>{record.from}</span>
+                    <span className={classNameMes} style={styleColor}>{record.message}</span>
                 </div>)
         }
 
@@ -52,9 +53,8 @@ class LogViewerComponent extends React.Component {
 }
 
 function mapStateToProps(state) {
-    let color = state.get("char").color
     let log = state.get("log")
-    return {color, log: log.toArray()}
+    return {log: log.toArray()}
 }
 
 let Wrap = connect(mapStateToProps)(LogViewerComponent)
