@@ -11,3 +11,9 @@ export function actionPushLog(message) {
         message
     }
 }
+
+export function actionReset() {
+    return {
+        type: "RESET"
+    }
+}

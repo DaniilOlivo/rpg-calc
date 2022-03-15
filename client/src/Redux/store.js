@@ -2,7 +2,7 @@ import { createStore } from "redux"
 import reducer from "./reducer"
 import { Map, List } from "immutable"
 
-let initState = new Map({
+export const initState = Map({
     "char": {},
     "log": List()
 })

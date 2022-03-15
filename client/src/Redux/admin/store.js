@@ -2,7 +2,7 @@ import { createStore } from "redux"
 import reducerAdmin from "./reducer"
 import { Map } from "immutable"
 
-const initState = Map({
+export const initState = Map({
     "chars": Map()
 })
 
