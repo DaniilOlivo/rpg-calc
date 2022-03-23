@@ -4,7 +4,7 @@ import { Provider, connect } from "react-redux"
 import store from "../Redux/store"
 import socket from "../Socket"
 
-class LogViewerComponent extends React.Component {
+export class LogViewerComponent extends React.Component {
     constructor(props) {
         super(props)
         this.refInput = React.createRef()
