@@ -118,7 +118,7 @@ function PickColor(props) {
     )
 }
 
-class BtnPickColor extends BtnModal {
+export class BtnPickColor extends BtnModal {
     componentDidMount() {
         this.setState({content: < PickColor />})
     }

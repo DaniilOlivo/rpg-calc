@@ -19,7 +19,7 @@ function MenuBtn(props) {
     )
 }
 
-class CharsMenu extends React.Component {
+export class CharsMenu extends React.Component {
     onClick = (char) => {
         this.props.setCurrent(char)
         setChar()
@@ -47,7 +47,7 @@ class CharsMenu extends React.Component {
     }
 }
 
-function mapStateToProps(state) {
+export function mapStateToProps(state) {
     let mapProps = {
         "chars": [],
         "currentChar": state.get("currentChar")
