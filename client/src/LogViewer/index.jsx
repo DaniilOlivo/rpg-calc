@@ -20,6 +20,8 @@ export class LogViewerComponent extends React.Component {
     render() {
         let arrRecords = []
         
+        let count = 0
+
         for (let record of this.props.log) {
             let classNameFrom = "log-viewer__from"
             let classNameMes = "log-viewer__message"
@@ -35,10 +37,11 @@ export class LogViewerComponent extends React.Component {
                 classNameFrom += " log-viewer__from_message"
             }
 
-            arrRecords.push(<div className="log-viewer__record">
+            arrRecords.push(<div className="log-viewer__record" key={count}>
                     <span className={classNameFrom} style={{color: record.color}}>{record.from}</span>
                     <span className={classNameMes} style={styleColor}>{record.message}</span>
                 </div>)
+            count++
         }
 
         return (

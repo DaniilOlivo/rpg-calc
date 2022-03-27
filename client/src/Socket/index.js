@@ -3,6 +3,10 @@ import { setListChars } from "../Redux/admin"
 
 const wsConnect = "ws://127.0.0.1:5500/ws/table"
 
+const throwErrorUnvalidArg = (arg) => {
+    if (!arg) throw new Error("Socket > API: Некорректный аргумент " + arg)
+}
+
 class Socket extends WebSocket {
     constructor() {
         super(wsConnect)
@@ -29,7 +33,8 @@ class Socket extends WebSocket {
         this.send({signal: "GET_ALL"})
     }
 
-    signalRegister(user) {
+    signalRegister(user) { 
+        throwErrorUnvalidArg(user)
         let packageWs = {
             signal: "REGISTER",
             user
@@ -38,15 +43,16 @@ class Socket extends WebSocket {
     }
 
     signalSetColor(color) {
+        throwErrorUnvalidArg(color)
         this.send({signal: "SET_COLOR", color})
     }
 
     sendMessage(message) {
+        throwErrorUnvalidArg(message)
         this.send({signal: "MESSAGE", message})
     }
 
     dispatcher(data) {
-        console.log(data)
         if (data.test) console.log(data.test)
         if (data.package) {
             if (data.character) setListChars(data.character, data.package)

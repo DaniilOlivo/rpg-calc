@@ -53,6 +53,10 @@ class App extends React.Component {
     }
   }
 
+  componentWillUnmount() {
+    socket.close()
+  }
+
   succesAuth = (user) => {
     this.setState(user)
     this.loadResourses()

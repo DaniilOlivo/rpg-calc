@@ -85,7 +85,7 @@
     width: 1000px;
     height: 600px;
 
-    background: #F1BA87 url("img/window.png");
+    background: #F1BA87 url("./window.png");
     background-size: cover;
     border: 10px solid #594022;
 

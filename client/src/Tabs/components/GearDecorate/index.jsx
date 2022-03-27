@@ -1,4 +1,4 @@
-import gearImage from "./img/gear.png"
+import gearImage from "./gear.png"
 import "./GearDecorate.css"
 
 function GearDecorate(props) {

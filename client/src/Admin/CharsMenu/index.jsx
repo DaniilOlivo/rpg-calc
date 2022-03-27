@@ -48,9 +48,11 @@ export class CharsMenu extends React.Component {
 }
 
 export function mapStateToProps(state) {
+    let currentChar = state.get("currentChar")
+    if (!currentChar) throw new Error("Admin > CharsMenu: Нет текущего персонажа")
     let mapProps = {
-        "chars": [],
-        "currentChar": state.get("currentChar")
+        chars: [],
+        currentChar
     }
     let chars = state.get("chars")
     for (let [nameChar, packageChar] of chars.entries()) {
