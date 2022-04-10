@@ -2,6 +2,9 @@
     border: 4px solid #594022;
     padding: 25px 30px;
     padding-top: 0;
+
+    display: flex;
+    flex-direction: column;
 }
 
 .block__title {

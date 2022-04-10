@@ -6,7 +6,6 @@ function getView(component, domain) {
         let char = state.get("char")
         
         let props = char[domain]
-        if (!props) throw new Error("Redux > getView: Нет такого домена " + domain)
         
         return props
     }

@@ -2,6 +2,8 @@ import React from "react"
 import {Tabs, TabList, Tab, TabPanel} from "react-tabs"
 import "./SubTabs.css"
 
+import Tip from "../../../components/Tip"
+
 const CLS_TABS = "tabs_subs"
 const CLS_TAB = "tab_sub"
 const CLS_TAB_ACTIVE = "tab_sub_active"
@@ -23,6 +25,7 @@ function SubTabs(props) {
         arrPanels.push(<TabPanel className={CLS_TAB_PANEL} key={count} >
                 <div className="workspace">
                     {content}
+                    < Tip />
                 </div>
             </TabPanel>)
         
