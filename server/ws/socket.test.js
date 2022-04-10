@@ -144,6 +144,56 @@ describe("Cигналы", () => {
         after(clearStubs)
     })
 
+    describe("SET", () => {
+        const data = {
+            hp: {
+                current: 10,
+                max: 15
+            }
+        }
+        let editChar = {}
+
+        let wsSpy = sinon.spy()
+        let wsAdminSpy = sinon.spy()
+
+        let packageWs
+        let packageAdminWs
+
+        before(async () => {
+            Object.assign(editChar, fakeChar)
+            editChar.charMain.params = data
+
+            callCoreStub.returns(Promise.resolve(editChar))
+
+            let journal = new Journal()
+
+            let socket = getTestSocket(wsSpy, journal)
+            let socketAdmin = getTestSocket(wsAdminSpy, journal)
+
+            await initSocket(socket, "Поркчоп", wsSpy)
+            await initSocket(socketAdmin, "Гачи Мастер", wsAdminSpy)
+
+            await socket.set(data)
+
+            packageWs = getPacakge(wsSpy, 1).package
+            packageAdminWs = getPacakge(wsAdminSpy).package
+        })
+
+        let checkHp = (packageWs) => assert.deepEqual(packageWs.charMain.params.hp, data.hp)
+        
+        it("SET ядра", () => {
+            let callCore = callCoreStub.firstCall
+            data.character = "Барак"
+            assert.equal(callCore.firstArg, "SET")
+            assert.deepEqual(JSON.parse(callCore.args[1]), data)
+
+        })
+        it("У пользователя произошли изменения", () => checkHp(packageWs))
+        it("У адмниа произошли изменения", () => checkHp(packageAdminWs))
+
+        after(clearStubs)
+    })
+
     describe("SET_COLOR", () => {
         let wsSpy = sinon.spy()
         let wsAdminSpy = sinon.spy()

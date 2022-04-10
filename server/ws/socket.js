@@ -49,6 +49,11 @@ class Socket {
         return dataChar
     }
 
+    async setDataCore(user, data) {
+        data.character = user.character
+        await python.callCore("SET", JSON.stringify(data))
+    }
+
     async get(user) {
         if (!user) user = this.journalWs.getUser(this.ws)
         Socket.logger("Get character " + user.username)
@@ -60,6 +65,15 @@ class Socket {
         for (let user of await userDB.getAllUsers(false)) {
             await this.sendAdmin(user)
         }
+    }
+
+    async set(data) {
+        Socket.logger("SET")
+        let user = this.journalWs.getUser(this.ws)
+        await this.setDataCore(user, data)
+        let char = await this.getDataCore(user)
+        this.send({package: char})
+        await this.sendAdmin(user)
     }
 
     async setColor(color) {
@@ -82,6 +96,7 @@ class Socket {
         if (signal === "REGISTER") this.register(packageWs.user)
         if (signal === "GET") this.get()
         if (signal === "GET_ALL") this.getAll()
+        if (signal === "SET") this.set(packageWs.data)
         if (signal === "SET_COLOR") this.setColor(packageWs.color)
         if (signal === "MESSAGE") this.message(packageWs.message)
     }
