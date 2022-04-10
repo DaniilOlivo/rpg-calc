@@ -18,7 +18,19 @@ def loadPickle(char: str):
 
 
 if __name__ == "__main__":
-    if (argv[1] == "GET"):
+    method = argv[1]
+    if (method == "GET"):
         playerObj = loadPickle(argv[2])
+        data = json.dumps(playerObj.decode())
+        print(data)
+    if (method == "SET"):
+        new_data = json.loads(argv[2])
+        charname = new_data["character"]
+        playerObj = loadPickle(charname)
+        new_data.pop("character")
+        new_data.pop("actionSet") # Временная заглушка
+        playerObj.setData(new_data)
+        writePickle(charname, playerObj)
+
         data = json.dumps(playerObj.decode())
         print(data)

@@ -1,4 +1,5 @@
 from libs.base import Tree, ModValues, DynamicTree, get_config
+from utils.findRecursion import findRecursion, EMPTY
 
 class ParamTable (Tree):
     def __init__(self):
@@ -63,7 +64,7 @@ class FeaturesTable (DynamicTree):
         self[item]["desc"] = desc
 
 
-class Player:
+class Player (dict):
     file_races = "race.json"
 
     def __init__(self,
@@ -79,17 +80,17 @@ class Player:
         self.race_title = self.race["title"]
         self.speed = self.race["speed"]
 
-        self.chars = chars 
+        self["chars"] = chars 
         
         for char, value in self.race["chars"].items():
-            self.chars.add_mod_value(char, "Раса", value)
+            self["chars"].add_mod_value(char, "Раса", value)
 
-        self.params = ParamTable()
+        self["params"] = ParamTable()
         self.effects = EffectsTable()
         self.features = FeaturesTable()
 
         self.calc()
-        self.params.full()
+        self["params"].full()
         
 
     def calc(self):
@@ -97,20 +98,20 @@ class Player:
 
     def _calc_params(self):
         base = 5
-        endurance = self.chars.get_value("END")
-        willpower = self.chars.get_value("WIL")
+        endurance = self["chars"].get_value("END")
+        willpower = self["chars"].get_value("WIL")
         
-        self.params["hp"]["max"] = base + endurance
-        self.params["mp"]["max"] = base + willpower
-        self.params["sp"]["max"] = base + (willpower + endurance) / 2
+        self["params"]["hp"]["max"] = base + endurance
+        self["params"]["mp"]["max"] = base + willpower
+        self["params"]["sp"]["max"] = base + (willpower + endurance) / 2
 
         if (endurance > 10):
             base += 1
         elif (endurance <= 5):
             base -= 1
         
-        self.params["hunger"]["max"] = base
-        self.params["fatigue"]["max"] = base
+        self["params"]["hunger"]["max"] = base
+        self["params"]["fatigue"]["max"] = base
 
     def _get_race(self, title: str):
         races = get_config(self.file_races)
@@ -118,7 +119,18 @@ class Player:
             if race["title"] == title:
                 return race
 
-        raise ValueError("Не найдено заданной расы :(") 
+        raise ValueError("Не найдено заданной расы :(")
+
+    def setData(self, data: dict):
+        for [key, value] in data.items():
+            result = findRecursion(key, self)
+            if result == EMPTY:
+                raise KeyError("Невозможно изменить данные! Нет данного ключа {}".format(key))
+            
+            parentObj, old_value = result
+            parentObj[key] = value
+
+        self.calc()
 
     def __str__(self):
         return self.name
@@ -128,8 +140,8 @@ class Player:
             "charMain": {
                 "name": self.name,
                 "race": self.race_title,
-                "params": self.params,
-                "chars": self.chars,
+                "params": self["params"],
+                "chars": self["chars"],
                 "effects": self.effects,
                 "features": self.features
             }

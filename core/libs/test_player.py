@@ -16,8 +16,8 @@ class TestPlayer(unittest.TestCase):
         self.player = Player("Барак", "Орк", CharTable(chars))
 
     def test_chars(self):
-        self.assertEqual(self.player.chars["STR"]["value"], 22)
-        self.assertEqual(self.player.chars["AGL"]["value"], 6)
+        self.assertEqual(self.player["chars"]["STR"]["value"], 22)
+        self.assertEqual(self.player["chars"]["AGL"]["value"], 6)
     
     def test_effects(self):
         self.player.effects.add_item("Кровавый понос", shade="negative", timeUnit="hour")
@@ -27,6 +27,17 @@ class TestPlayer(unittest.TestCase):
 
         self.assertEqual(alias, "Час")
         self.assertEqual(count, 1)
+
+    def test_setData(self):
+        data = {
+            "hp": {
+                "current": 10,
+                "max": 15
+            }
+        }
+        self.player.setData(data)
+        hp = self.player["params"]["hp"]
+        self.assertEqual(hp["current"], 10)
 
     def test_decode(self):
         decodePlayer = self.player.decode()
