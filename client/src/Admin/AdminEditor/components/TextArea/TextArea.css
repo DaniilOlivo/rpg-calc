@@ -1,0 +1,10 @@
+.text-area {
+    display: flex;
+    flex-direction: column;
+}
+
+.text-area__field {
+    resize: none;
+    padding: 5px 10px;
+    height: 80px;
+}

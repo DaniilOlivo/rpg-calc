@@ -1,0 +1,27 @@
+.integer-input__field {
+    width: 50px;
+    height: 30px;
+
+    text-align: center;
+
+    margin: 0 4px;
+    margin-bottom: 5px;
+}
+
+.integer-input__btn {
+    width: 20px;
+    height: 30px;
+
+    background: #A67A44;
+    border: 1px solid #594022;
+
+    transition: 200ms;
+}
+
+.integer-input__btn:hover {
+    box-shadow: 0px 2px 6px 1px rgba(0, 0, 0, 0.5);
+}
+
+.integer-input__btn_left {
+    margin-left: 10px;
+}

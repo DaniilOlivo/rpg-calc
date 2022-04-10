@@ -1,0 +1,30 @@
+.context-menu {
+    position: fixed;
+}
+
+.context-menu__variant {
+    border: 2px solid black;
+    background-color: rgba(10, 10, 10, 0.8);
+    color: white;
+
+    font-family: Lora;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.075em;
+    line-height: 20px;
+    font-style: normal;
+
+    padding: 0 10px;
+
+    cursor: pointer;
+
+    transition: 500ms;
+}
+
+.context-menu__variant:hover {
+    background-color: rgba(10, 10, 10, 0.95);
+}
+
+.context-menu__wrap__expand {
+    flex-grow: 1;
+}

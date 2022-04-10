@@ -42,6 +42,11 @@ class Socket extends WebSocket {
         this.send(packageWs)
     }
 
+    signalSet(data) {
+        throwErrorUnvalidArg(data)
+        this.send({signal: "SET", data})
+    }
+
     signalSetColor(color) {
         throwErrorUnvalidArg(color)
         this.send({signal: "SET_COLOR", color})

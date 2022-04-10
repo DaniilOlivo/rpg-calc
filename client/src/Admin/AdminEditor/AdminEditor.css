@@ -1,0 +1,122 @@
+.admin-editor__bg {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    z-index: 10;
+}
+
+.admin-editor__window {
+    background: url("./bg.png");
+    background-size: cover;
+
+    width: 625px;
+    height: 380px;
+
+    background-color: burlywood;
+
+    display: flex;
+    flex-direction: column;
+
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.075em;
+    font-style: normal;
+}
+
+.admin-editor__title {
+    background: linear-gradient(145.84deg, #432E14 0%, #312312 75.3%);
+    color: #F1BA87;
+
+    font-size: 14px;
+    font-weight: 400;
+
+    padding: 5px 30px;
+}
+
+.admin-editor__form {
+    border: 5px solid #432E14;
+    border-top: none;
+
+    padding: 20px;
+
+    flex-grow: 1;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-editor__form button, .admin-editor__form select {
+    font-family: Lora;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.075em;
+    font-style: normal;
+}
+
+.button-sumbit {
+    background: linear-gradient(145.84deg, #432E14 0%, #312312 75.3%);
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 5px;
+    color: #F1BA87;
+
+    width: 125px;
+    height: 40px;
+
+    border: none;
+
+    position: relative;
+}
+
+.button-sumbit::after {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 100%;
+    height: 100%;
+
+    opacity: 0;
+    background: linear-gradient(287.83deg, rgba(166, 122, 68, 0.5) 19.87%, rgba(89, 64, 34, 0) 81.04%);
+
+    transition: 500ms;
+}
+
+.button-sumbit:disabled {
+    color: #A67A44;
+}
+
+.button-sumbit:hover::after  {
+    opacity: 1;
+}
+
+.admin-editor__input {
+    background: #A67A44;
+    color: #26190D;
+    border: 2px solid #594022;
+    box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 0), inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+
+    padding: 0 10px;
+
+    margin-left: 10px;
+    margin-bottom: 5px;
+
+    transition: 200ms;
+}
+
+.admin-editor__input::placeholder {
+    color: rgba(89, 64, 34, 0.75);
+}
+
+.admin-editor__input:hover {
+    box-shadow: 0px 2px 6px 1px rgba(0, 0, 0, 0.5), inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
