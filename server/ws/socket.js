@@ -68,10 +68,9 @@ class Socket {
     }
 
     async set(data) {
-        Socket.logger("SET")
+        Socket.logger(`SET ${data}`)
         let user = this.journalWs.getUser(this.ws)
-        await this.setDataCore(user, data)
-        let char = await this.getDataCore(user)
+        let char = await this.setDataCore(user, data)
         this.send({package: char})
         await this.sendAdmin(user)
     }
