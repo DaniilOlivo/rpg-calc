@@ -1,5 +1,6 @@
 from os import path
 import json
+import copy
 
 dir_config = "config"
 
@@ -9,75 +10,107 @@ def get_config(name_config: str):
     return data
 
 
-class Tree(dict):
-    def __init__(self, config={}):
-        if config:
-            self.update(config)
+"""
+Архитектура ядра состоит из следующих компонентов (иерархия снизу верх):
+ - Значения, минимально атомарная единица (Parameter):
+    Числа, строки, булевы значения
+    Особые объекты типа ModSystem, которые представляют из себя значение,
+    формирующиеся из других значений
+- Элемент (Game Element):
+    Главное звено в структуре, отображающие какую-либо игровую сущность,
+    которое является dict с определенными значениями, задаваемые схемой.
+    Схема - это другой dict объект с названиями полей и дефолтными значениями.
+    Схему можно получить от двух источников: табличную и индивидуальную. Причем индивидуальная имеет
+    больший приоритет
+ - Таблица (Table):
+    Набор элементов управлюятся особым объектом - таблицей, которая предоставлеят функции
+    для менеджемента элементов. Как правило таблица наследуется и модифицируется в соотвествии со
+    сущностями, которыми она манипулирует. Далее таблицы могут быть сгрупированы в множетсво dict,
+    для удобной манипуляции над ними
+ - Игровые объекты (Game Object):
+    Все таблицы объединяются в игровые объекты со сложной логикой. Эти объекты будут использоваться
+    для представления данных и метаданных в интерфейсе. Каждый объект содержит регистр (registry),
+    где указаны все его таблицы и элементы, которые могут быть задейственны в игре и соовтественно
+    изменены.
+"""
 
-    def add_items(self, items: tuple):
-        for item in items:
-            self[item] = {}
+class ModSystem:
+    def __init__(self, base=0):
+        self.base = base
+        self.mod_values = {}
+        self.mod_settings = {}
     
-    def add_key(self, key: str, value):
-        for item in self:
-            self[item][key] = value
+    def _calc_value(self) -> int:
+        total_value = self.base
 
-
-class DynamicTree(Tree):
-    def __init__(self, config={}):
-        super().__init__(config)
-        self.defaultKeys = []
-    
-    def add_key(self, key, value):
-        self.defaultKeys.append((key, value))
-        super().add_key(key, value)
-
-    def add_item(self, item):
-        new_item = {}
-        for key, value in self.defaultKeys:
-            new_item[key] = value
-        self[item] = new_item
-
-
-class ModValues(Tree):
-    def __init__(self, config):
-        super().__init__(config)
-        for item in self:
-            self[item]["mod_values"] = {}
-        self.add_key("base_value", 0)
-        self.add_key("value", 0)
-
-    def update_base_values(self, mapValues: dict):
-        for item, value in mapValues.items():
-            self[item]["base_value"] = value
-            self._calc(item)
-
-    def _calc(self, item: str):
-        self[item]["value"] = self.get_value(item)
-
-    def add_mod_value(self, item: str, mod_label: str, mod_value: int):
-        self[item]["mod_values"][mod_label] = mod_value
-        self._calc(item)
-    
-    def del_mod_value(self, item: str, mod_label: str):
-        return self[item]["mod_values"].pop(mod_label)
-        self._calc(item)
-
-    def get_value(self, item: str):
-        total_value = self[item]["base_value"]
-        dict_values = self[item]["mod_values"]
-        for mod_value_label in dict_values:
-            total_value += dict_values[mod_value_label]
+        for mod_value in self.mod_values.values():
+            total_value += mod_value
+        
         return total_value
 
+    def set_mod(self, label: str, value: int, **flags):
+        self.mod_settings[label] = flags
+        self.mod_values[label] = value
+    
+    def del_mod(self, label: str):
+        self.mod_settings.pop(label)
+        self.mod_values.pop(label)
+        
+    @property
+    def value(self):
+        return self._calc_value()
 
-class GroupTree(Tree):
-    def __init__(self, config: dict):
-        valid_dict = {}
+    @property
+    def registry(self) -> dict:
+        return {
+            "base": self.base,
+            "mod_values": self.mod_values,
+            "mod_settings": self.mod_settings,
+            "value": self.value
+        }
+    
+    def __str__(self):
+        els = [self.base]
+        els.extend(self.mod_values.values())
+        present_str = "ModSystem"
+        present_str += "+".join(list(map(lambda number: str(number), els)))
+        return present_str
+    
+    def __repr__(self):
+        return self.__str__()
+
+
+class Effect:
+    def __init__(self, game_element, **kwargs):
+        if isinstance(game_element, ModSystem):
+            self.set = game_element.set_mod
+            self.unset = game_element.del_mod
         
-        for group_label, items in config.items():
-            for label, content in items.items():
-                valid_dict[label] = content
-                valid_dict["group"] = group_label
-        
-        super().__init__(valid_dict)
+        self.set(kwargs["label"], kwargs["value"])
+
+
+class Table (dict):
+    scheme = {}
+
+    def __init__(self, items=None):
+        if isinstance(items, list) or isinstance(items, tuple):        
+            for item in items:
+                self[item] = copy.deepcopy(self.scheme)
+        elif isinstance(items, dict):
+            for (item, scheme) in items.items():
+                self[item] = self._copy_scheme(scheme)
+        elif items:
+            raise TypeError("Не тот тип данных!")
+    
+    def _copy_scheme(self, element_scheme={}):
+        scheme = {}
+        scheme.update(copy.deepcopy(self.scheme))
+        if element_scheme:
+            scheme.update(copy.deepcopy(element_scheme))
+        return scheme
+
+    def add_item(self, item: str, element_scheme={}):
+        self[item] = self._copy_scheme(element_scheme) 
+
+class DynamicTable (Table):
+    pass

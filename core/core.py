@@ -1,7 +1,9 @@
 from sys import argv, path
-import json
+from utils.jsonParser import json_parser
 import pickle
 from db.character import Character
+
+from libs.player import Player
 
 def getChar(char: str):
     return Character.get(Character.name == char)
@@ -16,21 +18,31 @@ def loadPickle(char: str):
     player = pickle.loads(recordChar.pickle)
     return player
 
+def sendChar(playerObj: Player):
+    data = json_parser(playerObj.registry)
+    print(data)
+
+def getFlag(changesObj: dict, idFlag: str):
+    flag = changesObj[idFlag]
+    changesObj.pop(idFlag)
+    return flag
 
 if __name__ == "__main__":
     method = argv[1]
-    if (method == "GET"):
-        playerObj = loadPickle(argv[2])
-        data = json.dumps(playerObj.decode())
-        print(data)
-    if (method == "SET"):
-        new_data = json.loads(argv[2])
-        charname = new_data["character"]
-        playerObj = loadPickle(charname)
-        new_data.pop("character")
-        new_data.pop("actionSet") # Временная заглушка
-        playerObj.setData(new_data)
-        writePickle(charname, playerObj)
+    argument = argv[2]
 
-        data = json.dumps(playerObj.decode())
-        print(data)
+    if (method == "GET"):
+        playerObj = loadPickle(argument)
+        sendChar(playerObj)
+    if (method == "SET"):
+        changes = json_parser(argument)
+
+        charname = getFlag(changes, "character")
+        action_type = getFlag(changes, "actionSet")
+
+        playerObj = loadPickle(charname)
+        playerObj.setData(changes, action_type)
+
+        sendChar(playerObj)
+
+        writePickle(charname, playerObj)
