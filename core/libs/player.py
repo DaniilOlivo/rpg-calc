@@ -46,6 +46,7 @@ class EffectsTable (Table):
     }
 
     scheme = {
+        "effect": None,
         "desc": "",
         "shade": "neutral",
         "timeNumber": 1,
@@ -65,28 +66,19 @@ class EffectsTable (Table):
 
 class FeaturesTable (Table):
     scheme = {
+        "effect": None,
         "desc": ""
     }
 
 
-class Player (dict):
-    file_races = "race.json"
+class Player:
+    _file_races = "race.json"
 
-    def __init__(self,
-        name: str,
-        race: str,
-        chars: dict,
-        **options
-        ):
-
+    def __init__(self, name: str, race: str, **options):
         self.name = name
-
         self.race = self._get_race(race)
-        self.race_title = self.race["title"]
-        self.speed = ModSystem(self.race["speed"])
 
-        self.chars = CharTable(chars)
-        
+        self.chars = CharTable(options.get("chars", {}))
         for char, value in self.race["chars"].items():
             self.chars[char]["value"].set_mod("Раса", value, readonly=True)
 
@@ -103,8 +95,7 @@ class Player (dict):
         return {
             "charMain": {
                 "name": self.name,
-                "race": self.race_title,
-                "speed": self.speed,
+                "race": self.race["title"],
                 "params": self.params,
                 "chars": self.chars,
                 "effects": self.effects,
@@ -120,16 +111,16 @@ class Player (dict):
         endurance = self.chars["END"]["value"].value
         willpower = self.chars["WIL"]["value"].value
         
-        stoic = base
-        if (endurance > 10):
+        stoic = 0
+        if (endurance > 15):
             stoic += 1
-        elif (endurance <= 5):
+        elif (endurance < 5):
             stoic -= 1
         
         params = {
             "hp": endurance,
-            "sp": willpower,
-            "mp": (willpower + endurance) / 2,
+            "sp": (willpower + endurance) / 2,
+            "mp": willpower,
             "hunger": stoic,
             "fatigue": stoic
         }
@@ -138,32 +129,27 @@ class Player (dict):
             mod_system.base = base
             mod_system.set_mod("Характеристики", bonus, readonly=True)
         
-
     def _get_race(self, title: str):
-        races = get_config(self.file_races)
+        races = get_config(self._file_races)
         for race in races:
             if race["title"] == title:
                 return race
 
-        raise ValueError("Не найдено заданной расы :(")
+        raise ValueError("Not found race {}".format(title))
 
-    
-
-    def setData(self, data: dict, action_type: str):
+    def set_change(self, data: dict, action_type: str):
         for id_element, changes_element in data.items():
             result = find.findRecursion(id_element, self.registry)
             if result == find.EMPTY:
-                raise KeyError("Невозможно изменить данные! Нет данного ключа {}".format(key))
+                raise KeyError("Not found element {}".format(id_element))
 
-            table, scheme_elemenet = result
+            table, element = result
             for parameter, change in changes_element.items():
-                # Если изменнеия комплексные, то значит это сложный объект по типу ModSystem
                 if isinstance(change, dict):
-                    complex_value = scheme_elemenet[parameter]
+                    complex_value = element[parameter]
                     self._set_complex(complex_value, change, action_type)
-                # Простые изменения
                 else:
-                    scheme_elemenet[parameter] = change
+                    element[parameter] = change
 
         self.calc()
     
@@ -187,6 +173,5 @@ class Player (dict):
         else:
             raise AssertionError("Нет такого action - {}".format(action_type))
         
-
     def __str__(self):
         return self.name
