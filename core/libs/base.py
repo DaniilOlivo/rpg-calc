@@ -155,4 +155,7 @@ class Table (dict):
         return scheme
 
     def add_item(self, item: str, element_scheme={}):
-        self[item] = self._copy_scheme(element_scheme) 
+        self[item] = self._copy_scheme(element_scheme)
+
+    def edit_item(self, item: str, parameter: str, value):
+        self[item][parameter] = value

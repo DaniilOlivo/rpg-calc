@@ -1,4 +1,5 @@
 from libs.base import get_config, ModSystem, Effect, Table
+from libs.skills import SkillTable
 import utils.findRecursion as find
 
 
@@ -77,6 +78,7 @@ class Player:
     def __init__(self, name: str, race: str, **options):
         self.name = name
         self.race = self._get_race(race)
+        self.bio = options.get("bio", "")
 
         self.chars = CharTable(options.get("chars", {}))
         for char, value in self.race["chars"].items():
@@ -87,6 +89,8 @@ class Player:
         self.effects = EffectsTable()
         self.features = FeaturesTable()
 
+        self.skills = SkillTable(options.get("skills", {}))
+
         self.calc()
         self.params.full()
 
@@ -96,10 +100,15 @@ class Player:
             "charMain": {
                 "name": self.name,
                 "race": self.race["title"],
+                "bio": self.bio,
                 "params": self.params,
                 "chars": self.chars,
                 "effects": self.effects,
                 "features": self.features
+            },
+
+            "charSkills": {
+                "skills": self.skills,
             }
         }
 
@@ -149,7 +158,7 @@ class Player:
                     complex_value = element[parameter]
                     self._set_complex(complex_value, change, action_type)
                 else:
-                    element[parameter] = change
+                    table.edit_item(id_element, parameter, change)
 
         self.calc()
     
