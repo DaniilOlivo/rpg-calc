@@ -23,8 +23,10 @@ class TimeTracker:
         }
 
         self._seq_date = ("hour", "day", "mounth", "year")
+        self._mod_date = {"hour": 1, "day": 24, "mounth": 720, "year": 8640}
 
         self.map_plan = {}
+        self.stack_subcribes = []
 
     def _set_date_unit(self, num: int, unit: str):
         limit = self._limit_data[unit]
@@ -70,11 +72,23 @@ class TimeTracker:
             stack_date.append(action)
         else:
             self.map_plan[key_date] = [action,]
+        
+    def subscribe(self, func_subcribe):
+        self.stack_subcribes.append(func_subcribe)
+    
+    def unsubscribe(self, func_subcribe):
+        self.stack_subcribes.remove(func_subcribe)
+
+    def _call_subscribes(self, step: int, unit: str):
+        difference_days = self._translate_unit(step, unit, "day")
+        for subscribe in self.stack_subcribes:
+            subscribe(difference_days)
 
     def step(self, count: int, unit="hour"):
         new_date = self._calc_step(count, unit)
         self.current_data.update(new_date)
         self._check_plan(new_date)
+        self._call_subscribes(count, unit)
 
     def _get_hours_date(self, date: dict) -> int:
         hours = 1
@@ -89,6 +103,10 @@ class TimeTracker:
             mounth=date["mounth"] + 1,
             year=date["year"],
         )
+    
+    def _translate_unit(self, count: int, source_unit: str, target_unit: str):
+        hours = self._mod_date[source_unit] * count
+        return int(hours / self._mod_date[target_unit])
 
     def __str__(self) -> str:
         return self.get_str_date(self.current_data)

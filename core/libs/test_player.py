@@ -142,6 +142,26 @@ class TestPlayer(unittest.TestCase):
         hp = self.player.params["hp"]["max"]
         self.assertEqual(hp.mod_values["Характеристики"], 20)
 
+    def test_needs(self):
+        hunger = self.player.params["hunger"]
+        features = self.player.features
+
+        self.player.step_time(1)
+        self.assertEqual(hunger["current"], 5)
+
+        self.player.step_time(6)
+        self.assertEqual(hunger["current"], 0)
+        self.assertIn("Истощение 2 степени", features)
+
+        self.player.params.full()
+        self.player.step_time(1)
+        self.assertIn("Истощение 1 степени", features)
+        self.assertNotIn("Истощение 2 степени", features)
+
+        self.player.params.full("hunger")
+        self.player.step_time(6)
+        self.assertIn("Истощение 1 степени", features)
+
 
     def test_decode(self):
         decodePlayer = self.player.registry

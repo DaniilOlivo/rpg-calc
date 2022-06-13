@@ -6,12 +6,16 @@ class TestTimeTracker (unittest.TestCase):
     def setUp(self):
         self.tracker = controller.TimeTracker()
         self.action_call = False
+        self.spy_data = 0
 
     def action(self):
         self.action_call = True
     
     def reset_action(self):
         self.action_call = False
+
+    def spy_subscribe(self, difference: int):
+        self.spy_data = difference
 
     def _eq_dates(self, true_date: str):
         self.assertEqual(str(self.tracker), true_date)
@@ -39,3 +43,8 @@ class TestTimeTracker (unittest.TestCase):
         self.tracker.set_plan(self.action, 20)
         self.tracker.step(20)
         self.assertTrue(self.action_call)
+    
+    def test_subscribe(self):
+        self.tracker.subscribe(self.spy_subscribe)
+        self.tracker.step(5, "mounth")
+        self.assertEqual(self.spy_data, 150)

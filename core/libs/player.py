@@ -22,6 +22,20 @@ class ParamTable (Table):
         
         for item in items:
             self[item]["current"] = self[item]["max"].value
+    
+    def change_current(self, item: str, difference: int) -> int:
+        param = self[item]
+        param["current"] += difference
+
+        param_current = param["current"]
+        param_max = param["max"].value
+
+        if param_current < 0:
+            param["current"] = 0
+        elif param_current > param_max:
+            param["current"] = param_max
+
+        return param["current"]
 
 
 class CharTable (Table):
@@ -73,6 +87,8 @@ class FeaturesTable (Table):
 
 
 class Player:
+    MAX_DEGREE_EXHAUSTION = 6
+
     _file_races = "race.json"
 
     def __init__(self, name: str, race: str, **options):
@@ -90,6 +106,8 @@ class Player:
         self.features = FeaturesTable()
 
         self.skills = SkillTable(options.get("skills", {}))
+
+        self.degree_exhaustion = 0
 
         self.calc()
         self.params.full()
@@ -114,6 +132,9 @@ class Player:
 
     def calc(self):
         self._calc_params()
+    
+    def step_time(self, difference: int):
+        self._calc_needs(difference)
 
     def _calc_params(self):
         base = 5
@@ -137,6 +158,34 @@ class Player:
             mod_system =  self.params[param]["max"]
             mod_system.base = base
             mod_system.set_mod("Характеристики", bonus, readonly=True)
+    
+    def _set_exhaustion(self, degree: int):
+        if self.degree_exhaustion > 0:
+            self.features.pop("Истощение {} степени".format(self.degree_exhaustion))
+        
+        self.degree_exhaustion += degree
+
+        if self.degree_exhaustion > self.MAX_DEGREE_EXHAUSTION:
+            self.degree_exhaustion = self.MAX_DEGREE_EXHAUSTION
+
+        if self.degree_exhaustion > 0:
+            self.features.add_item("Истощение {} степени".format(self.degree_exhaustion))
+
+    def _calc_needs(self, difference: int):
+        needs = ("hunger", "fatigue")
+
+        for day in range(difference):
+            flag_exhaustion = True
+            for need in needs:
+                value_need = self.params[need]["current"]
+                if value_need == 0:
+                    self._set_exhaustion(+1)
+                    flag_exhaustion = False
+                else:
+                    self.params.change_current(need, -1)
+                    
+            if self.degree_exhaustion != 0 and flag_exhaustion:
+                        self._set_exhaustion(-1)
         
     def _get_race(self, title: str):
         races = get_config(self._file_races)
