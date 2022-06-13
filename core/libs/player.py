@@ -1,4 +1,5 @@
 from libs.base import get_config, ModSystem, Effect, Table
+from libs.skills import SkillTable
 import utils.findRecursion as find
 
 
@@ -21,6 +22,20 @@ class ParamTable (Table):
         
         for item in items:
             self[item]["current"] = self[item]["max"].value
+    
+    def change_current(self, item: str, difference: int) -> int:
+        param = self[item]
+        param["current"] += difference
+
+        param_current = param["current"]
+        param_max = param["max"].value
+
+        if param_current < 0:
+            param["current"] = 0
+        elif param_current > param_max:
+            param["current"] = param_max
+
+        return param["current"]
 
 
 class CharTable (Table):
@@ -46,6 +61,7 @@ class EffectsTable (Table):
     }
 
     scheme = {
+        "effect": None,
         "desc": "",
         "shade": "neutral",
         "timeNumber": 1,
@@ -65,28 +81,22 @@ class EffectsTable (Table):
 
 class FeaturesTable (Table):
     scheme = {
+        "effect": None,
         "desc": ""
     }
 
 
-class Player (dict):
-    file_races = "race.json"
+class Player:
+    MAX_DEGREE_EXHAUSTION = 6
 
-    def __init__(self,
-        name: str,
-        race: str,
-        chars: dict,
-        **options
-        ):
+    _file_races = "race.json"
 
+    def __init__(self, name: str, race: str, **options):
         self.name = name
-
         self.race = self._get_race(race)
-        self.race_title = self.race["title"]
-        self.speed = ModSystem(self.race["speed"])
+        self.bio = options.get("bio", "")
 
-        self.chars = CharTable(chars)
-        
+        self.chars = CharTable(options.get("chars", {}))
         for char, value in self.race["chars"].items():
             self.chars[char]["value"].set_mod("Раса", value, readonly=True)
 
@@ -94,6 +104,10 @@ class Player (dict):
 
         self.effects = EffectsTable()
         self.features = FeaturesTable()
+
+        self.skills = SkillTable(options.get("skills", {}))
+
+        self.degree_exhaustion = 0
 
         self.calc()
         self.params.full()
@@ -103,33 +117,40 @@ class Player (dict):
         return {
             "charMain": {
                 "name": self.name,
-                "race": self.race_title,
-                "speed": self.speed,
+                "race": self.race["title"],
+                "bio": self.bio,
                 "params": self.params,
                 "chars": self.chars,
                 "effects": self.effects,
                 "features": self.features
+            },
+
+            "charSkills": {
+                "skills": self.skills,
             }
         }
 
     def calc(self):
         self._calc_params()
+    
+    def step_time(self, difference: int):
+        self._calc_needs(difference)
 
     def _calc_params(self):
         base = 5
         endurance = self.chars["END"]["value"].value
         willpower = self.chars["WIL"]["value"].value
         
-        stoic = base
-        if (endurance > 10):
+        stoic = 0
+        if (endurance > 15):
             stoic += 1
-        elif (endurance <= 5):
+        elif (endurance < 5):
             stoic -= 1
         
         params = {
             "hp": endurance,
-            "sp": willpower,
-            "mp": (willpower + endurance) / 2,
+            "sp": (willpower + endurance) / 2,
+            "mp": willpower,
             "hunger": stoic,
             "fatigue": stoic
         }
@@ -137,31 +158,54 @@ class Player (dict):
             mod_system =  self.params[param]["max"]
             mod_system.base = base
             mod_system.set_mod("Характеристики", bonus, readonly=True)
+    
+    def _set_exhaustion(self, degree: int):
+        if self.degree_exhaustion > 0:
+            self.features.pop("Истощение {} степени".format(self.degree_exhaustion))
         
+        self.degree_exhaustion += degree
 
+        if self.degree_exhaustion > self.MAX_DEGREE_EXHAUSTION:
+            self.degree_exhaustion = self.MAX_DEGREE_EXHAUSTION
+
+        if self.degree_exhaustion > 0:
+            self.features.add_item("Истощение {} степени".format(self.degree_exhaustion))
+
+    def _calc_needs(self, difference: int):
+        needs = ("hunger", "fatigue")
+
+        for day in range(difference):
+            flag_exhaustion = True
+            for need in needs:
+                value_need = self.params[need]["current"]
+                if value_need == 0:
+                    self._set_exhaustion(+1)
+                    flag_exhaustion = False
+                else:
+                    self.params.change_current(need, -1)
+                    
+            if self.degree_exhaustion != 0 and flag_exhaustion:
+                        self._set_exhaustion(-1)
+        
     def _get_race(self, title: str):
-        races = get_config(self.file_races)
+        races = get_config(self._file_races)
         for race in races:
             if race["title"] == title:
                 return race
 
-        raise ValueError("Не найдено заданной расы :(")
+        raise ValueError("Not found race {}".format(title))
 
-    
-
-    def setData(self, data: dict, action_type: str):
+    def set_change(self, data: dict, action_type: str):
         for id_element, changes_element in data.items():
             result = find.findRecursion(id_element, self.registry)
             if result == find.EMPTY:
-                raise KeyError("Невозможно изменить данные! Нет данного ключа {}".format(key))
+                raise KeyError("Not found element {}".format(id_element))
 
-            table, scheme_elemenet = result
+            table, element = result
             for parameter, change in changes_element.items():
-                # Если изменнеия комплексные, то значит это сложный объект по типу ModSystem
                 if isinstance(change, dict):
-                    complex_value = scheme_elemenet[parameter]
+                    complex_value = element[parameter]
                     self._set_complex(complex_value, change, action_type)
-                # Простые изменения
                 else:
                     self._set_simple(scheme_elemenet, parameter, change)
 
@@ -169,9 +213,9 @@ class Player (dict):
     
     def _set_simple(self, scheme_element: dict, parameter: str, change):
         try:
-            scheme_element[parameter] = int(change)
+            table.edit_item(scheme_element, parameter, int(change))
         except:
-            scheme_element[parameter] = change
+            table.edit_item(scheme_element, parameter, change)
 
     def _set_complex(self, complex_value: ModSystem, change: dict, action_type: str):
         label = change["label"]
@@ -199,6 +243,5 @@ class Player (dict):
         else:
             raise AssertionError("Нет такого action - {}".format(action_type))
         
-
     def __str__(self):
         return self.name

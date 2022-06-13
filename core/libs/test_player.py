@@ -3,12 +3,6 @@ from utils.jsonParser import json_parser
 from libs.base import ModSystem, Effect
 from libs.player import Player, ParamTable, CharTable, EffectsTable
 
-class TestEffect (unittest.TestCase):
-    def test_change_game_element(self):
-        mod_system = ModSystem()
-        effect = Effect(mod_system, label="За красивые глаза", value=5)
-        self.assertEqual(mod_system.value, 5)
-
 class TestCharTable (unittest.TestCase):
     def test_init(self):
         char_table = CharTable()
@@ -55,7 +49,7 @@ class TestPlayer(unittest.TestCase):
             "WIL": 10,
             "CHR": 10,
         }
-        self.player = Player("Барак", "Орк", chars)
+        self.player = Player("Барак", "Орк", chars=chars)
         self.data = {
             "hp": {
                 "max": {
@@ -71,7 +65,7 @@ class TestPlayer(unittest.TestCase):
                 "current": 10,
             }
         }
-        self.player.setData(data, "ADD")
+        self.player.set_change(data, "SIMPLE")
         hp = self.player.params["hp"]
         self.assertEqual(hp["current"], 10)
 
@@ -85,7 +79,7 @@ class TestPlayer(unittest.TestCase):
                 }
             }
         }
-        self.player.setData(data, "ADD")
+        self.player.set_change(data, "ADD")
         hp = self.player.params["hp"]
         self.assertEqual(hp["max"].mod_values[label], 5)
         self.assertEqual(hp["max"].value, 30)
@@ -102,7 +96,7 @@ class TestPlayer(unittest.TestCase):
                 }
             }
         }
-        self.player.setData(data, "ADD")
+        self.player.set_change(data, "ADD")
         end = self.player.chars["END"]
         hp = self.player.params["hp"]
         self.assertEqual(end["value"].value, 22)
@@ -120,11 +114,11 @@ class TestPlayer(unittest.TestCase):
                 }
             }
         }
-        self.player.setData(data, "ADD")
+        self.player.set_change(data, "ADD")
         change = data["hp"]["max"]
         change["newLabel"] = label_2
         change["value"] = 10
-        self.player.setData(data, "EDIT")
+        self.player.set_change(data, "EDIT")
         hp = self.player.params["hp"]["max"]
         self.assertEqual(hp.value, 35)
         mod = hp.mod_values
@@ -132,8 +126,8 @@ class TestPlayer(unittest.TestCase):
         self.assertIn(label_2, mod)
 
     def test_set_del(self):
-        self.player.setData(self.data, "ADD")
-        self.player.setData(self.data, "DEL")
+        self.player.set_change(self.data, "ADD")
+        self.player.set_change(self.data, "DEL")
         self.assertEqual(self.player.params["hp"]["max"].value, 25)
 
     def test_set_readonly(self):
@@ -144,7 +138,7 @@ class TestPlayer(unittest.TestCase):
                 }
             }
         }
-        self.player.setData(data, "DEL")
+        self.player.set_change(data, "DEL")
         hp = self.player.params["hp"]["max"]
         self.assertEqual(hp.mod_values["Характеристики"], 20)
 
@@ -156,6 +150,26 @@ class TestPlayer(unittest.TestCase):
         }
         self.player.setData(data, "EDIT")
         self.assertEqual(self.player.params["hp"]["current"], -2)
+
+    def test_needs(self):
+        hunger = self.player.params["hunger"]
+        features = self.player.features
+
+        self.player.step_time(1)
+        self.assertEqual(hunger["current"], 5)
+
+        self.player.step_time(6)
+        self.assertEqual(hunger["current"], 0)
+        self.assertIn("Истощение 2 степени", features)
+
+        self.player.params.full()
+        self.player.step_time(1)
+        self.assertIn("Истощение 1 степени", features)
+        self.assertNotIn("Истощение 2 степени", features)
+
+        self.player.params.full("hunger")
+        self.player.step_time(6)
+        self.assertIn("Истощение 1 степени", features)
 
     def test_decode(self):
         decodePlayer = self.player.registry
