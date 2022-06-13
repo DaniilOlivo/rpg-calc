@@ -3,15 +3,10 @@ import "./CharParam.css"
 import ScaleSolid from "../../../../components/Scales/ScaleSolid"
 import ScaleSegment from "../../../../components/Scales/ScaleSegment"
 
-import EditableComponent from "../../../../components/EditableComponent"
-import GameComponent from "../../../../components/GameComponent"
+import ElementGC from "../../../../components/ElementGC"
+
 
 function CharParam(props) {
-    let fields = [
-        {id: "current", label: "Текущее значение"},
-        {id: "max", label: "Максимальное значение"}
-    ]
-
     let paramsData = [
         {id: "hp", title: "Здоровье"},
         {id: "sp", title: "Выносливость"},
@@ -22,53 +17,71 @@ function CharParam(props) {
 
     for (let paramObj of paramsData) {
         let id = paramObj.id
-        let schemeData = []
-        for (let fieldObj of fields) {
-            schemeData.push({
-                id: [id, fieldObj.id].join("."),
-                type: "INTEGER",
-                label: [fieldObj.label, id].join(' '),
-                value: props[id][fieldObj.id]
-            })
-        }
+        let gameObject = props[id]
 
+        let schemeData = {
+            current: {
+                type: "INTEGER",
+                label: "Текущее значение " + id
+            },
+            max: {
+                type: "MOD",
+                label: "Максимальное значение " + id
+            } 
+        }
+        
         paramsComponents.push(
-            <GameComponent title={paramObj.title} schemeData={schemeData} key={id}>
+            <ElementGC
+                idElement={id}
+                gameElement={gameObject}
+                schemeData={schemeData}
+                title={paramObj.title}
+                key={id}>
                 < ScaleSolid
                     title={id}
-                    currentValue={props[id].current}
-                    maxValue={props[id].max}
+                    currentValue={gameObject.current}
+                    maxValue={gameObject.max.value}
                     classNameColor={`scale_solid__fill_${id}`} />
-            </GameComponent>
+            </ElementGC>
         )
     }
 
     let needsData = [
-        {id: "hunger", title: "Голод", label: "Голод", labelCase: "голода", color: "orange"},
-        {id: "fatigue", title: "Усталость", label: "Усталость", labelCase: "усталости", color: "lime"}
+        {id: "hunger", title: "Голод", labelCase: "голода", color: "orange"},
+        {id: "fatigue", title: "Усталость", labelCase: "усталости", color: "lime"}
     ]
 
     let needsComponents = []
 
     for (let needObj of needsData) {
-        let schemeData = []
-        for (let fieldObj of fields) {
-            schemeData.push({
-                id: [needObj.id, fieldObj.id].join('.'),
-                type: "INTEGER",
-                label: [fieldObj.label, needObj.labelCase].join(' '),
-                value: props[needObj.id][fieldObj.id]
-            })
-        }
+        let id = needObj.id
+        let title = needObj.title
+        let gameObject = props[id]
 
-        needsComponents.push(<span key={needObj.label}>{needObj.label}</span>)
+        let schemeData = {
+            current: {
+                type: "INTEGER",
+                label: "Текущее значение " + needObj.labelCase,
+            },
+            max: {
+                type: "INTEGER",
+                label: "Максимальное значение " + needObj.labelCase
+            }
+        }
+        console.log(gameObject)
+        needsComponents.push(<span key={title}>{title}</span>)
         needsComponents.push(
-            <GameComponent title={needObj.title} schemeData={schemeData} key={needObj.id}>
+            <ElementGC
+                idElement={id}
+                gameElement={gameObject}
+                schemeData={schemeData}
+                title={title}
+                key={id}>
                 < ScaleSegment 
-                        currentValue={props[needObj.id].current}
-                        maxValue={props[needObj.id].max}
+                        currentValue={gameObject.current}
+                        maxValue={gameObject.max.value}
                         classNameColor={`scale_segment__fill_${needObj.color}`} />
-            </GameComponent>
+            </ElementGC>
         )
     }
 

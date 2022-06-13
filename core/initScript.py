@@ -5,7 +5,7 @@ from db.character import Character
 if __name__ == "__main__":
     Character.drop_table()
     Character.create_table()
-    barak = player.Player("Барак", "Орк", player.CharTable({
+    barak = player.Player("Барак", "Орк", {
         "STR": 20,
         "END": 17,
         "AGL": 6,
@@ -13,8 +13,8 @@ if __name__ == "__main__":
         "INT": 2,
         "WIL": 10,
         "CHR": 10,
-    }))
-    kochan = player.Player("Чан Кочан", "Человек", player.CharTable({
+    })
+    kochan = player.Player("Чан Кочан", "Человек", {
         "STR": 8,
         "END": 10,
         "AGL": 16,
@@ -22,6 +22,6 @@ if __name__ == "__main__":
         "INT": 10,
         "WIL": 15,
         "CHR": 7,
-    }))
+    })
     Character(name="Барак", pickle=pickle.dumps(barak)).save()
     Character(name="Чан Кочан", pickle=pickle.dumps(kochan)).save()

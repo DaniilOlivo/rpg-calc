@@ -12,6 +12,10 @@ class Socket {
         console.log("WS | " + message)
     }
 
+    static loggerObject(obj) {
+        console.log(obj)
+    }
+
     send(data) {
         this.ws.send(JSON.stringify(data))
     }
@@ -51,7 +55,7 @@ class Socket {
 
     async setDataCore(user, data) {
         data.character = user.character
-        await python.callCore("SET", JSON.stringify(data))
+        return await python.callCore("SET", JSON.stringify(data))
     }
 
     async get(user) {
@@ -68,7 +72,8 @@ class Socket {
     }
 
     async set(data) {
-        Socket.logger(`SET ${data}`)
+        Socket.logger(`SET`)
+        Socket.loggerObject(data)
         let user = this.journalWs.getUser(this.ws)
         let char = await this.setDataCore(user, data)
         this.send({package: char})

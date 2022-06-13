@@ -163,14 +163,23 @@ class Player (dict):
                     self._set_complex(complex_value, change, action_type)
                 # Простые изменения
                 else:
-                    scheme_elemenet[parameter] = change
+                    self._set_simple(scheme_elemenet, parameter, change)
 
         self.calc()
     
+    def _set_simple(self, scheme_element: dict, parameter: str, change):
+        try:
+            scheme_element[parameter] = int(change)
+        except:
+            scheme_element[parameter] = change
+
     def _set_complex(self, complex_value: ModSystem, change: dict, action_type: str):
         label = change["label"]
         if action_type != "DEL":
-            value = change["value"]
+            if "value" in change:
+                value = int(change["value"])
+            else:
+                value = int(complex_value.mod_values[label])
         
         if action_type in ("EDIT", "DEL"):
             readonly = complex_value.mod_settings[label]
@@ -181,7 +190,10 @@ class Player (dict):
             complex_value.set_mod(label, value)
         elif action_type == "EDIT":
             complex_value.del_mod(label)
-            complex_value.set_mod(change["newLabel"], value)
+            newLabel = label
+            if "newLabel" in change:
+                newLabel = change["newLabel"]
+            complex_value.set_mod(newLabel, value)
         elif action_type == "DEL":
             complex_value.del_mod(label)
         else:

@@ -1,4 +1,5 @@
 from sys import argv, path
+import json
 from utils.jsonParser import json_parser
 import pickle
 from db.character import Character
@@ -35,7 +36,7 @@ if __name__ == "__main__":
         playerObj = loadPickle(argument)
         sendChar(playerObj)
     if (method == "SET"):
-        changes = json_parser(argument)
+        changes = json.loads(argument)
 
         charname = getFlag(changes, "character")
         action_type = getFlag(changes, "actionSet")

@@ -10,7 +10,7 @@ function TextInput(props) {
         <LabelInput className="text-input" label={props.label} desc={props.desc}>
             <input type="text"
                 className="admin-editor__input text-input__field"
-                placeholder={props.currentValue}
+                placeholder={props.value}
                 onChange={e => handler(e.target.value)} />
         </LabelInput>
     )
