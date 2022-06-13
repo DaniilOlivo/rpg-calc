@@ -1,5 +1,9 @@
 from playhouse.db_url import connect
+import os
 
-connectionString = "postgresql://postgres:admin@localhost:5432/postgres"
+try:
+    connectionString = os.environ["DATABASE_URL"]
+except:
+    connectionString = "postgresql://postgres:admin@localhost:5432/postgres"
 
-db = connect(connectionString)
+db = connect(connectionString, sslmode='require')

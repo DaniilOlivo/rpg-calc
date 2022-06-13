@@ -1,7 +1,7 @@
 import { setCharData, pushLog } from "../Redux"
 import { setListChars } from "../Redux/admin"
 
-const wsConnect = "ws://127.0.0.1:5500/ws/table"
+const wsConnect = "wss://rpg-calc.herokuapp.com/ws/table"
 
 const throwErrorUnvalidArg = (arg) => {
     if (!arg) throw new Error("Socket > API: Некорректный аргумент " + arg)
