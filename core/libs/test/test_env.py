@@ -1,10 +1,10 @@
 import unittest
-import libs.global_controller as controller
+import libs.env as env
 
 
 class TestTimeTracker (unittest.TestCase):
     def setUp(self):
-        self.tracker = controller.TimeTracker()
+        self.tracker = env.TimeTracker()
         self.action_call = False
         self.spy_data = 0
 
@@ -48,3 +48,14 @@ class TestTimeTracker (unittest.TestCase):
         self.tracker.subscribe(self.spy_subscribe)
         self.tracker.step(5, "mounth")
         self.assertEqual(self.spy_data, 150)
+    
+    def test_set_change(self):
+        package_change = {
+            "STEP": {
+                "count": 5
+            }
+        }
+
+        self.tracker.set_change(package_change)
+
+        self._eq_dates("5:00 1.1.1234")

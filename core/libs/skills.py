@@ -37,3 +37,6 @@ class SkillTable (base.Table):
         if parameter == "xp":
             if value >= self[item]["require_xp"]:
                 self.level_up(item)
+    
+    def mod(self, item: str) -> int:
+        return int(self[item]["level"] / 2)
