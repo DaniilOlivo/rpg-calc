@@ -1,13 +1,13 @@
-from libs.base import get_config, ModSystem, Effect, Table
+import libs.base as base
 from libs.skills import SkillTable
 import utils.findRecursion as find
 
 
-class ParamTable (Table):
+class ParamTable (base.Table):
     params = ("hp", "mp", "sp", "hunger", "fatigue")
 
     scheme = {
-        "max": ModSystem(),
+        "max": base.ModSystem(),
         "current": 0
     }
 
@@ -38,23 +38,26 @@ class ParamTable (Table):
         return param["current"]
 
 
-class CharTable (Table):
+class CharTable (base.Table):
     scheme = {
-        "value": ModSystem()
+        "value": base.ModSystem()
     }
 
     def __init__(self, mapBase={}):
-        config = get_config("chars.json")
+        config = base.get_config("chars.json")
         super().__init__(config)
         
         if mapBase:
-            for (item, base) in mapBase.items():
+            for (item, base_item) in mapBase.items():
                 if not item in self:
                     raise IndexError("Нет такой сущности!")
-                self[item]["value"].base = base
+                self[item]["value"].base = base_item
+    
+    def mod(self, item: str) -> int:
+        return int((self[item]["value"].value - 10) / 2)
 
 
-class EffectsTable (Table):
+class EffectsTable (base.Table):
     units = {
         "logic": ("turn", "hour", "day"),
         "alias": ("Ход", "Час", "День",)
@@ -79,19 +82,20 @@ class EffectsTable (Table):
         self.translate(item)
 
 
-class FeaturesTable (Table):
+class FeaturesTable (base.Table):
     scheme = {
         "effect": None,
         "desc": ""
     }
 
 
-class Player:
+class Player (base.GameObject):
     MAX_DEGREE_EXHAUSTION = 6
 
     _file_races = "race.json"
 
-    def __init__(self, name: str, race: str, **options):
+    def __init__(self, id_player: str, name: str, race: str, **options):
+        super().__init__(id_player)
         self.name = name
         self.race = self._get_race(race)
         self.bio = options.get("bio", "")
@@ -107,6 +111,8 @@ class Player:
 
         self.skills = SkillTable(options.get("skills", {}))
 
+        self.destiny = 0
+
         self.degree_exhaustion = 0
 
         self.calc()
@@ -114,7 +120,8 @@ class Player:
 
     @property    
     def registry(self) -> dict:
-        return {
+        proto_dict = super().registry
+        proto_dict.update({
             "charMain": {
                 "name": self.name,
                 "race": self.race["title"],
@@ -128,7 +135,8 @@ class Player:
             "charSkills": {
                 "skills": self.skills,
             }
-        }
+        })
+        return proto_dict
 
     def calc(self):
         self._calc_params()
@@ -158,6 +166,11 @@ class Player:
             mod_system =  self.params[param]["max"]
             mod_system.base = base
             mod_system.set_mod("Характеристики", bonus, readonly=True)
+        
+        if self.params["hp"] == 0:
+            self.features.add_item("Без сознания")
+        else:
+            self.features.pop("Без сознания", None)
     
     def _set_exhaustion(self, degree: int):
         if self.degree_exhaustion > 0:
@@ -188,30 +201,42 @@ class Player:
                         self._set_exhaustion(-1)
         
     def _get_race(self, title: str):
-        races = get_config(self._file_races)
+        races = base.get_config(self._file_races)
         for race in races:
             if race["title"] == title:
                 return race
 
         raise ValueError("Not found race {}".format(title))
+    
+    def _change_table(self, id_element: str, change: dict, action: str):
+        result = find.findRecursion(id_element, self.registry)
+        if result == find.EMPTY:
+            raise KeyError("Not found element {}".format(id_element))
+        
+        table, element = result
+        for parameter, change_parameter in change.items():
+            if action.startswith("MOD_"):
+                complex_value = element[parameter]
+                next_action = action[action.find('_') + 1:]
+                self._set_complex(complex_value, change_parameter, next_action)
+            else:
+                table.edit_item(id_element, parameter, change_parameter)
 
-    def set_change(self, data: dict, action_type: str):
-        for id_element, changes_element in data.items():
-            result = find.findRecursion(id_element, self.registry)
-            if result == find.EMPTY:
-                raise KeyError("Not found element {}".format(id_element))
 
-            table, element = result
-            for parameter, change in changes_element.items():
-                if isinstance(change, dict):
-                    complex_value = element[parameter]
-                    self._set_complex(complex_value, change, action_type)
-                else:
-                    table.edit_item(id_element, parameter, change)
+    def set_change(self, package_change: dict):
+        for action, change in package_change.items():
+            action:str
+            change:dict
+            if action.startswith("TABLE_"):
+                for id_element, subchange in change.items():
+                    next_action = action[action.find('_') + 1:]
+                    self._change_table(id_element, subchange, next_action)
+            else:
+                raise KeyError("Action {} undifined".format(action))
 
         self.calc()
     
-    def _set_complex(self, complex_value: ModSystem, change: dict, action_type: str):
+    def _set_complex(self, complex_value: base.ModSystem, change: dict, action_type: str):
         label = change["label"]
         if action_type != "DEL":
             value = change["value"]

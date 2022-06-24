@@ -1,5 +1,6 @@
 import unittest
 import libs.base as base
+import libs.effects as effects
 
 class SimpleGameObject:
     def __init__(self):
@@ -33,9 +34,10 @@ class TestEffect (unittest.TestCase):
 
     def test_mod(self):
         label = "За красивые глаза"
-        effect = base.ModEffect(self.game_object, "element",
+        effect = effects.ModEffect(self.game_object, "element",
             parameter="mod_system", label=label, value=5
         )
+        effect.activate()
         mod_system = self.get_parameter("mod_system")
         self.assertEqual(mod_system.mod_values[label], 5)
 
@@ -45,7 +47,7 @@ class TestEffect (unittest.TestCase):
     
     def test_action(self):
         tracker = MockTimeTracker()
-        effect = base.ActionEffect(self.game_object, "element", tracker,
+        effect = effects.ActionEffect(self.game_object, "element", tracker,
             count=5, step=10, parameter="hp", action=-1
         )
         self.assertEqual(self.get_parameter("hp"), 5)
