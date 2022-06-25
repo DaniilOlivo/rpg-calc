@@ -1,9 +1,9 @@
 import json
-import libs.player as player
+from libs.base import ModSystem
 
 class ExtendEncoder(json.JSONEncoder):
     def default(self, obj):
-        if isinstance(obj, player.ModSystem):
+        if isinstance(obj, ModSystem):
             return obj.registry
         else:
             return super().default(obj)
