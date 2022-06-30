@@ -1,3 +1,4 @@
+import jsonpickle
 import libs.player as player
 from libs.global_controller import GlobalController
 import pickle
@@ -30,16 +31,10 @@ if __name__ == "__main__":
     CoreGame.create_table(safe=True)
     controller = GlobalController()
 
-    barak = player.Player("player_barak", "Барак", "Орк", chars=CHARS_BARAK)
-    kochan = player.Player("player_kochan", "Чан Кочан", "Человек", chars=CHARS_KOCHAN)
+    barak = player.Player("player_barak", name="Барак", race="Орк", chars=CHARS_BARAK)
+    kochan = player.Player("player_kochan", name="Чан Кочан", race="Человек", chars=CHARS_KOCHAN)
 
     controller.add_object(barak)
     controller.add_object(kochan)
 
-    core_record = CoreGame(
-        id_controller="global_controller",
-        pickle=pickle.dumps(controller),
-        json_shandow=json_parser(controller.get_objects())
-    )
-    core_record.save()
-    
+    CoreGame(id_controller="global_controller", json_shandow=jsonpickle.encode(controller)).save()

@@ -48,7 +48,7 @@ class TestPlayer(unittest.TestCase):
             "WIL": 10,
             "CHR": 10,
         }
-        self.player = player.Player("player_barak", "Барак", "Орк", chars=chars)
+        self.player = player.Player("player_barak", name="Барак", race="Орк", chars=chars)
 
     def test_table_edit_int(self):
         package_change = {

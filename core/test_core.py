@@ -1,21 +1,18 @@
 import unittest
 from libs.player import Player
 import coreAPI
-import json
+import jsonpickle
+from libs.global_controller import GlobalController
+
 
 class TestCore(unittest.TestCase):
     def setUp(self):
         self.controller_enity = coreAPI.get_controller()
-        self.controller_object = coreAPI.get_controller_object(self.controller_enity)
+        self.controller_object = jsonpickle.decode(self.controller_enity.json_shandow)
+        self.controller_object:GlobalController
     
     def test_get_controller(self):
-        objects = self.controller_object.space_objects
-        self.assertIn('player_barak', objects)
-
-    def test_get_json(self):
-        json_shandow = self.controller_enity.json_shandow
-        shandow_object = json.loads(json_shandow)
-        self.assertEqual(shandow_object[0]["id"], "time_tracker")
+        self.assertIn('player_barak', self.controller_object.space_objects)
     
     def test_write_controller(self):
         package_change = {
@@ -32,7 +29,10 @@ class TestCore(unittest.TestCase):
         }
         self.controller_object.set_change(package_change)
         coreAPI.write_controller(self.controller_enity, self.controller_object)
-        new_controller = coreAPI.get_controller_object(self.controller_enity)
+
+        new_controller_enity = coreAPI.get_controller()
+        new_controller = jsonpickle.decode(new_controller_enity.json_shandow)
+        new_controller:GlobalController
         player = new_controller.space_objects["player_barak"]
         player:Player
         mod_system_str = player.chars["STR"]["value"]

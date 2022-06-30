@@ -5,7 +5,7 @@ from libs.player import Player
 
 class TestInventory (unittest.TestCase):
     def setUp(self):
-        self.player = Player("test_player", "Барак", "Орк")
+        self.player = Player("test_player", name="Барак", race="Орк")
         self.inventory = inventory.Inventory(self.player)
     
     def test_add_item(self):

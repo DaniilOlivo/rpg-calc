@@ -94,13 +94,13 @@ class Player (base.GameObject):
 
     _file_races = "race.json"
 
-    def __init__(self, id_player: str, name: str, race: str, **options):
+    def __init__(self, id_player="player", **config):
         super().__init__(id_player)
-        self.name = name
-        self.race = self._get_race(race)
-        self.bio = options.get("bio", "")
+        self.name = config.get("name", "player")
+        self.race = self._get_race(config.get("race", "Человек"))
+        self.bio = config.get("bio", "")
 
-        self.chars = CharTable(options.get("chars", {}))
+        self.chars = CharTable(config.get("chars", {}))
         for char, value in self.race["chars"].items():
             self.chars[char]["value"].set_mod("Раса", value, readonly=True)
 
@@ -109,11 +109,11 @@ class Player (base.GameObject):
         self.effects = EffectsTable()
         self.features = FeaturesTable()
 
-        self.skills = SkillTable(options.get("skills", {}))
+        self.skills = SkillTable(config.get("skills", {}))
 
-        self.destiny = 0
+        self.destiny = config.get("destiny", 0)
 
-        self.degree_exhaustion = 0
+        self.degree_exhaustion = config.get("exhaustion", 0)
 
         self.calc()
         self.params.full()
