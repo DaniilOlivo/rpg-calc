@@ -6,104 +6,91 @@ class Socket {
     constructor(ws, journalWs) {
         this.ws = ws
         this.journalWs = journalWs
+        this.user = null
     }
 
-    static logger(message) {
-        console.log("WS | " + message)
+    logger(message) {
+        let startStr = "WS | "
+        if (this.user) {
+            startStr += this.user.username + " | "
+        }
+        console.log(startStr + message)
     }
 
-    send(data) {
-        this.ws.send(JSON.stringify(data))
-    }
-
-    async sendAdmin(user) {
-        const packageWs = JSON.stringify({
-            character: user.character,
-            package: await this.getDataCore(user)
-        })
-        let wsAdmin = this.journalWs.getWSAdmin()
-        if (wsAdmin) wsAdmin.send(packageWs)
-    }
-
-    pingPong() {
-        Socket.logger("Test connection")
-        this.send({signal: "PONG"})
-    }
-
-    async register(username) {
-        Socket.logger("Register " + username)
-        let user = await this.journalWs.addSocket(this.ws, username)
-        this.send({signal: "REGISTER", admin: user.admin})
-        this.broadcast(log.packageMesHello(user))
+    send(data, admin=false) {
+        let ws = this.ws
+        if (admin) {
+            ws = this.journalWs.getSocket({admin: true})
+        }
+        if (!ws) ws.send(JSON.stringify(data))
     }
 
     broadcast(packageWs) {
         for (let { ws } of this.journalWs) {
-            ws.send(JSON.stringify(packageWs)) 
+            ws.send(packageWs) 
         }
     }
 
-    async getDataCore(user) {
-        let dataChar = await python.callCore("GET", user.character)
-        dataChar.color = user.color
-        return dataChar
+    async getDataCore() {
+        return await python.callCore("GET")
     }
 
-    async setDataCore(user, data) {
-        data.character = user.character
-        await python.callCore("SET", JSON.stringify(data))
+    async setDataCore(packageChange) {
+        return await python.callCore("SET", JSON.stringify(packageChange))
     }
 
-    async get(user) {
-        if (!user) user = this.journalWs.getUser(this.ws)
-        Socket.logger("Get character " + user.username)
-        this.send({package: await this.getDataCore(user)})
+    async changeColor(new_color) {
+        this.user.color = new_color
+        await this.user.save()
     }
 
-    async getAll() {
-        Socket.logger("Get all characters")
-        for (let user of await userDB.getAllUsers(false)) {
-            await this.sendAdmin(user)
-        }
+    pingPong() {
+        this.logger("Test connection")
+        this.send({signal: "PONG"})
     }
 
-    async set(data) {
-        Socket.logger(`SET ${data}`)
-        let user = this.journalWs.getUser(this.ws)
-        let char = await this.setDataCore(user, data)
-        this.send({package: char})
-        await this.sendAdmin(user)
+    register(username) {
+        this.logger("REGISTER " + username)
+        this.user = userDB.getUser({username})
+        this.journalWs.addSocket(this.ws, this.user)
+        this.send({signal: "REGISTER", admin: this.user.admin})
+        this.broadcast(log.packageMesHello(this.user))
     }
 
-    async setColor(color) {
-        let user = this.journalWs.getUser(this.ws)
-        user.color = color
-        await user.save()
-        let updateChar = await this.getDataCore(user)
-        this.send({package: updateChar})
-        await this.sendAdmin(user)
+    async get() {
+        this.logger("GET")
+        this.send({package: await this.getDataCore()})
+    }
+
+    async set(packageChange) {
+        this.logger("SET")
+        let packageWs = {package: await this.setDataCore(packageChange)}
+        this.send(packageWs)
+        this.send(packageWs, true)
     }
 
     message(message) {
-        let user = this.journalWs.getUser(this.ws)
-        this.broadcast(log.packageMes(user, message))
+        this.broadcast(log.packageMes(this.user, message))
     }
 
     dispatcher(packageWs) {
         let signal = packageWs.signal
+
+        // Skip other signals, while ws not register
+        if (signal !== "REGISTER" && !this.user) {
+            return
+        }
+
         if (signal === "PING") this.pingPong()
-        if (signal === "REGISTER") this.register(packageWs.user)
+        if (signal === "REGISTER") this.register(packageWs.username)
         if (signal === "GET") this.get()
-        if (signal === "GET_ALL") this.getAll()
-        if (signal === "SET") this.set(packageWs.data)
-        if (signal === "SET_COLOR") this.setColor(packageWs.color)
+        if (signal === "SET") this.set(packageWs.packageChange)
         if (signal === "MESSAGE") this.message(packageWs.message)
     }
 
     close() {
-        Socket.logger("Close")
-        let user = this.journalWs.getUser(this.ws)
-        this.broadcast(log.packageMesGoodbye(user))
+        this.logger("CLOSE")
+        this.broadcast(log.packageMesGoodbye(this.user))
         this.journalWs.removeSocket(this.ws)
     }
 }

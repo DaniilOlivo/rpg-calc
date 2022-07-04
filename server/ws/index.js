@@ -11,11 +11,11 @@ const journalWs = new Journal()
 
 wsRouter.ws("/table", (ws, req) => {
     let socket = new Socket(ws, journalWs)
-    Socket.logger("Connect")
+    socket.logger("CONNECT")
 
     ws.on("message", (data) => {
-        let package = JSON.parse(data)
-        socket.dispatcher(package)
+        let packageWs = JSON.parse(data)
+        socket.dispatcher(packageWs)
     })
 
     ws.on("close", () => {
