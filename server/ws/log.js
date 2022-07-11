@@ -16,9 +16,10 @@ const closeGoodbye = [
 ]
 
 function baseMes(user, message, type) {
+    let username = (user) ? user.username : ""
+
     return {
-        from: user.username,
-        color: user.color,
+        from: username,
         message, type
     }
 }

@@ -17,17 +17,17 @@ class Socket {
         console.log(startStr + message)
     }
 
-    send(data, admin=false) {
+    send(packageWs, admin=false) {
         let ws = this.ws
         if (admin) {
-            ws = this.journalWs.getSocket({admin: true})
+            ws = this.journalWs.getSocket({admin: true}).ws
         }
-        if (!ws) ws.send(JSON.stringify(data))
+        if (ws) ws.send(JSON.stringify(packageWs))
     }
 
     broadcast(packageWs) {
         for (let { ws } of this.journalWs) {
-            ws.send(packageWs) 
+            ws.send(JSON.stringify(packageWs)) 
         }
     }
 
@@ -49,9 +49,9 @@ class Socket {
         this.send({signal: "PONG"})
     }
 
-    register(username) {
+    async register(username) {
         this.logger("REGISTER " + username)
-        this.user = userDB.getUser({username})
+        this.user = await userDB.getUser({username})
         this.journalWs.addSocket(this.ws, this.user)
         this.send({signal: "REGISTER", admin: this.user.admin})
         this.broadcast(log.packageMesHello(this.user))
@@ -75,9 +75,10 @@ class Socket {
 
     dispatcher(packageWs) {
         let signal = packageWs.signal
-
+        
         // Skip other signals, while ws not register
-        if (signal !== "REGISTER" && !this.user) {
+        let boolAllowSimpleSignals = signal == "REGISTER" || signal == "PING" 
+        if (!boolAllowSimpleSignals && !this.user) {
             return
         }
 
