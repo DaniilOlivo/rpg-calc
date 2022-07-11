@@ -220,7 +220,11 @@ class Player (base.GameObject):
                 next_action = action[action.find('_') + 1:]
                 self._set_complex(complex_value, change_parameter, next_action)
             else:
-                table.edit_item(id_element, parameter, change_parameter)
+                try:
+                    change = int(change_parameter)
+                except ValueError:
+                    change = change_parameter
+                table.edit_item(id_element, parameter, change)
 
 
     def set_change(self, package_change: dict):
@@ -239,7 +243,10 @@ class Player (base.GameObject):
     def _set_complex(self, complex_value: base.ModSystem, change: dict, action_type: str):
         label = change["label"]
         if action_type != "DEL":
-            value = change["value"]
+            if "value" in change:
+                value = int(change["value"])
+            else:
+                value = int(complex_value.mod_values[label])
         
         if action_type in ("EDIT", "DEL"):
             readonly = complex_value.mod_settings[label]
@@ -250,7 +257,10 @@ class Player (base.GameObject):
             complex_value.set_mod(label, value)
         elif action_type == "EDIT":
             complex_value.del_mod(label)
-            complex_value.set_mod(change["newLabel"], value)
+            newLabel = label
+            if "newLabel" in change:
+                newLabel = change["newLabel"]
+            complex_value.set_mod(newLabel, value)
         elif action_type == "DEL":
             complex_value.del_mod(label)
         else:

@@ -1,0 +1,60 @@
+.modal-form__bg {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 10;
+}
+
+.modal-form__window {
+    background: url("../../img/bg_paper.png");
+    background-size: cover;
+
+    background-color: burlywood;
+
+    display: flex;
+    flex-direction: column;
+
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.075em;
+    font-style: normal;
+}
+
+.modal-form__window_standard {
+    width: 625px;
+    height: 380px;
+}
+
+.modal-form__window_list {
+    width: 300px;
+    height: 380px;
+}
+
+.modal-form__title {
+    background: linear-gradient(145.84deg, #432E14 0%, #312312 75.3%);
+    color: #F1BA87;
+
+    font-size: 14px;
+    font-weight: 400;
+
+    padding: 5px 30px;
+}
+
+.modal_form__content {
+    border: 5px solid #432E14;
+    border-top: none;
+
+    padding: 20px;
+
+    flex-grow: 1;
+
+    display: flex;
+    flex-direction: column;
+}

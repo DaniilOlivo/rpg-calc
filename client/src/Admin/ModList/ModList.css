@@ -1,0 +1,50 @@
+.mod-list__total {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.mod-list__total_value {
+    font-weight: bold;
+    margin: 0 10px;
+}
+
+.mod-label {
+    display: flex;
+    align-items: center;
+    height: 60px;
+
+    border-bottom: 2px #26190D solid;
+}
+
+.mod-label__label {
+    flex-grow: 1;
+}
+
+.mod-label__value {
+    margin: 0 15px;
+}
+
+.mod-label__value_positive {
+    color: #0A8407;
+}
+
+.mod-label__value_negative {
+    color: #C52300;
+}
+
+.mod-list__panel-control {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    flex-grow: 1;
+}
+
+.mod-label__del {
+    width: 20px;
+    height: 20px;
+}
+
+.mod-list__add {
+    width: 30px;
+    height: 30px;
+}

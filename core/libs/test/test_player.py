@@ -180,6 +180,15 @@ class TestPlayer(unittest.TestCase):
         hp = self.player.params["hp"]["max"]
         self.assertEqual(hp.mod_values["Характеристики"], 20)
 
+    def test_set_str_number(self):
+        data = {
+            "hp": {
+                "current": "-2"
+            }
+        }
+        self.player.setData(data, "EDIT")
+        self.assertEqual(self.player.params["hp"]["current"], -2)
+
     def test_needs(self):
         hunger = self.player.params["hunger"]
         features = self.player.features

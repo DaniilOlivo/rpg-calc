@@ -1,31 +1,31 @@
 import React from "react";
 import "./AdminEditor.css"
 
+import ModalForm from "../../components/ModalForm";
+
 import TextInput from "./components/TextInput"
 import TextArea from "./components/TextArea"
 import IntegerInput from "./components/IntegerInput"
 import SelectBox from "./components/SelectBox"
+import ModElement from "./components/ModElement";
+
+import ButtonForm from "./components/ButtonForm";
 
 import socket from "../../Socket";
-
-function ButtonSumbit(props) {
-    return (<button className="button-sumbit" onClick={props.onClick} disabled={props.disabled}>
-                {props.children}
-            </button>)
-}
 
 class AdminEditor extends React.Component {
     constructor(props) {
         super(props)
 
-        this.fieldsValues = {}
+        this.fields = {}
 
         let valid = true
 
         for (let {id, value} of this.props.schemeData) {
-            this.fieldsValues[id] = {
+            this.fields[id] = {
                 value,
-                valid: true,
+                valid: true, // Флаг валидности поля
+                changed: false
             }
             if (!value) valid = false
         }
@@ -33,77 +33,82 @@ class AdminEditor extends React.Component {
         this.state = {valid}
     }
 
-    onChange = (id, valueObj) => {
-        this.fieldsValues[id] = valueObj
-
+    checkValid() {
         let flag = true
-        for (let {value, valid} of Object.values(this.fieldsValues)) {
+        for (let {value, valid} of Object.values(this.fields)) {
             if (!valid || !value) flag = false
         }
 
         this.setState({valid: flag})
     }
 
+    _setValueField(id, value) {
+        let field = this.fields[id]
+        field.changed = true
+        field.value = value
+    }
+
+    onChange = (id, valueObj) => {
+        valueObj.changed = true
+        this.fields[id] = valueObj
+        this.checkValid()
+    }
+
     sumbit = () => {
         let data = {}
-
-        let decomposeId = (id, obj, value) => {
-            let elementsId = id.split('.')
-
-            if (elementsId.length === 1) {
-                obj[id] = value
-            } else {
-                let stepId = elementsId[0]
-                let stepObj = obj[stepId]
-                if (!stepObj) {
-                    stepObj = {}
-                    obj[stepId] = stepObj
-                }
-                let newId = elementsId.splice(1).join('.')
-                decomposeId(newId, stepObj, value)
-            }
+        let parameters = {}
+        for (let [id, valueObj] of Object.entries(this.fields)) {
+            if (!valueObj.changed) continue
+            parameters[id] = valueObj.value
         }
-
-        for (let [id, valueObj] of Object.entries(this.fieldsValues)) {
-            let {value} = valueObj
-            decomposeId(id, data, value)
+        // Костыль для ModSystem
+        let arrId = this.props.idElement.split('.')
+        if (arrId.length > 1) {
+            let subData = {}
+            data[arrId[0]] = subData
+            subData[arrId[1]] = parameters
+        } else {
+            data[this.props.idElement] = parameters
         }
-        
         data.actionSet = this.props.action.key
+        console.log(data)
         socket.signalSet(data)
         this.props.closeEditor()
+    }
+
+    _getField(fieldData) {
+        let Field = null
+        let type = fieldData.type
+        
+        if (type === "SHORT") Field = TextInput
+        if (type === "LONG") Field = TextArea
+        if (type === "INTEGER") Field = IntegerInput
+        if (type === "SELECT") Field = SelectBox
+        if (type === "MOD") Field = ModElement
+        if (type === "HIDE") this._setValueField(fieldData.id, fieldData.value)
+
+        return Field
     }
 
     render() {
         let fields = []
         for (let fieldData of this.props.schemeData) {
-            let Field
+            let Field = this._getField(fieldData)    
 
-            let type = fieldData.type
-            if (type === "SHORT") Field = TextInput
-            if (type === "LONG") Field = TextArea
-            if (type === "INTEGER") Field = IntegerInput
-            if (type === "SELECT") Field = SelectBox
-
-            fields.push(
-                < Field {...fieldData} onChange={this.onChange} key={fieldData.id} />
-            )
+            if (Field) {
+                fields.push(
+                    < Field {...fieldData} onChange={this.onChange} rootId={this.props.idElement} key={fieldData.id} />
+                )
+            }
         }
 
         let titleWindow = [this.props.action.label, this.props.title].join(' ')
 
         return (
-            <div className="admin-editor">
-                <div className="admin-editor__bg" onClick={this.props.closeEditor} >
-                    <div className="admin-editor__window">
-                        <h3 className="admin-editor__title">{titleWindow}</h3>
-                        <div className="admin-editor__form">
-                            { fields }
-                            <ButtonSumbit disabled={!this.state.valid} onClick={this.sumbit}>Отправить</ButtonSumbit>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ModalForm titleWindow={titleWindow} close={this.props.closeEditor}>
+                { fields }
+                <ButtonForm disabled={!this.state.valid} onClick={this.sumbit}>Отправить</ButtonForm>
+            </ModalForm>
         )
     }
 }

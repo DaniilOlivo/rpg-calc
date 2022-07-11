@@ -1,6 +1,5 @@
 import React from "react"
 import AdminEditor from "../../../Admin/AdminEditor"
-import ContextMenu from "../../../components/ContextMenu"
 
 const ACTIONS = {
     ADD: {
@@ -17,127 +16,85 @@ const ACTIONS = {
     }
 }
 
-let emptyVariant = () => {
-    throw new Error("Опция пуста, и не имеет обработчика")
-}
-
-const structMenu = [
-    {
-        title: "Добавить",
-        action: ACTIONS.ADD,
-        handler: emptyVariant
-    },
-    {
-        title: "Изменить",
-        action: ACTIONS.EDIT,
-        handler: emptyVariant
-    },
-    {
-        title: "Удалить",
-        action: ACTIONS.DEL,
-        handler: emptyVariant
-    }
-]
-
 class GameComponent extends React.Component {
     constructor(props) {
+        /*
+        Пропсы:
+        gameElement: Игровой объект на основе которого будет содзаваться схема
+        schemeData: Схема для полей, которые содежит их настройки как например тип
+            Если параметра нет в схеме, то он не будт отображаться в форме
+        title: Название элемента, нужно для заголовков
+        idElement: ID элемента, необходимый для socket API
+        action: Тип действия
+        close: Функция закрытия, для дополнительных действий. Необязательна
+        children: Дочерний компонент, представляющий отображение игрового элемента
+        */
         super(props)
 
+        let action = ACTIONS.EDIT
+        if (props.action) {
+            action = ACTIONS[props.action]
+        }
+
         this.state = {
-            openContextMenu: false,
+            openListMod: false,
             openAdminEditor: false,
-            action: null
-        }
-
-        this.pos = {
-            x: 0, y: 0
-        }
-
-        this.structMenu = []
-        
-        for (let variantObj of structMenu) {
-            let copyVariantObj = {}
-            Object.assign(copyVariantObj, variantObj)
-            this.structMenu.push(copyVariantObj)
-
-            if (props.contextMenu) {
-                let entryMenu = props.contextMenu.entry
-                if (entryMenu) {
-                    copyVariantObj.title += " " + entryMenu
-                }
-            }
-
-            copyVariantObj.handler = (e) => this.openAdminEditor(e, copyVariantObj.action)
+            action
         }
     }
 
-    openContextMenu = (e) => {
-        e.preventDefault()
-        this.pos.x = e.clientX
-        this.pos.y = e.clientY
-        this.setState({openContextMenu: true})
-    }
-
-    closeContextMenu = (e) => {
-        this.setState({openContextMenu: false})
-    }
-
-    openAdminEditor = (e, action=ACTIONS.EDIT) => {
-        this.setState({openAdminEditor: true, action})
+    openAdminEditor = (e) => {
+        this.setState({openAdminEditor: true})
     }
 
     closeAdminEditor = (e) => {
-        if (!e || e.target === e.currentTarget) {
-            this.setState({openAdminEditor: false, action: null})
+        // Костыль
+        if (this.props.close) {
+            this.props.close()
         }
+        this.setState({openAdminEditor: false})
     }
 
-    render() {
+    getScheme() {
+        let gameElement = this.props.gameElement
+
+        let schemeData = []
+        if (gameElement) {
+            for (let [parameter, value] of Object.entries(gameElement)) {
+                let settings = this.props.schemeData[parameter]
+                if (!settings) continue
+                schemeData.push({
+                    id: parameter,
+                    type: settings.type,
+                    label: settings.label,
+                    value: value
+                })
+            }
+        } else {
+            for (let [parameter, settings] of Object.entries(this.props.schemeData))
+            schemeData.push({
+                id: parameter,
+                type: settings.type,
+                label: settings.label,
+                value: settings.value
+            })
+        }
+
+        return schemeData
+    }
+
+    getAdminEditor() {
         let adminEditor = null
 
         if (this.state.openAdminEditor) {
             adminEditor = < AdminEditor title={this.props.title}
-                schemeData={this.props.schemeData}
+                idElement={this.props.idElement}
+                schemeData={this.getScheme()}
                 action={this.state.action}
                 closeEditor={this.closeAdminEditor} />
         }
 
-        let contextMenu = null
-        if (this.state.openContextMenu) {
-            contextMenu = < ContextMenu 
-                variants={this.structMenu}
-                close={this.closeContextMenu}
-                xPos={this.pos.x} yPos={this.pos.y} />
-        }
-
-        let adminEditorCall = null
-        let contextMenuCall = null
-
-        let styleGameComponentContainer
-
-        if (this.props.contextMenu) {
-            contextMenuCall = this.openContextMenu
-        } else {
-            styleGameComponentContainer = {cursor: "pointer"}
-            adminEditorCall = this.openAdminEditor
-        }
-
-        return (
-            <div className="game-component">
-                <div className="game-component__container"
-                    style={styleGameComponentContainer}
-                    onClick={adminEditorCall}
-                    onContextMenu={contextMenuCall}>
-                    {this.props.children}
-                </div>
-                <div className="admin-editor__container">
-                    {adminEditor}
-                </div>
-                <div className="context-menu__container">
-                    {contextMenu}
-                </div> 
-            </div>
-        )
+        return adminEditor
     }
 }
 

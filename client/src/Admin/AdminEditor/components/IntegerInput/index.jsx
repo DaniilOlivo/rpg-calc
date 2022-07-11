@@ -3,9 +3,7 @@ import "./IntegerInput.css"
 
 import LabelInput from "../LabelComponent"
 
-function isNumber(stringValue) {
-    return Number.isInteger(+stringValue)
-}
+import { isNumber } from "../../../../utils/funcTypeData"
 
 class IntegerInput extends React.Component {
     constructor(props) {
@@ -39,7 +37,11 @@ class IntegerInput extends React.Component {
             this.setState({value})
             let sendValue = value
             if (this.getDelta(value)) {
-                sendValue = parseInt(this.props.value) + parseInt(value)
+                if (this.props.value) {
+                    sendValue = parseInt(this.props.value) + parseInt(value)
+                } else {
+                    sendValue = parseInt(value)
+                }
             }
             this.props.onChange(this.props.id, {value: sendValue, valid: logicValid})
         } 
@@ -48,7 +50,8 @@ class IntegerInput extends React.Component {
     btnClick = (e, sign) => {
         let increment = 1
         if (e.ctrlKey) increment = 10
-        let lastValue = (this.state.value === '') ? this.props.value : this.state.value
+        let initValue = this.props.value ?? 0
+        let lastValue = (this.state.value === '') ? initValue : this.state.value
         let value = parseInt(lastValue) + parseInt(sign + increment)
         this.handler(String(value))
     }
