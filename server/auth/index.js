@@ -34,14 +34,14 @@ const router = express.Router()
 
 function getUserSession(req) {
     return {
-        user: req.user.username,
+        username: req.user.username,
         admin: req.user.admin
     }
 }
 
 router.post("/login", passport.authenticate("local"), (req, res) => res.json(getUserSession(req)))
 router.get("/user", (req, res) => {
-    let dataRes = {user: false}
+    let dataRes = {username: false}
 
     if (req.user) dataRes = getUserSession(req)
 

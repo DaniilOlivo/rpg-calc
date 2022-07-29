@@ -1,6 +1,4 @@
 import React from "react"
-
-import ModalWindow from "../ModalWindow"
 import "./ModalError.css"
 
 class ModalError extends React.Component {
@@ -10,12 +8,17 @@ class ModalError extends React.Component {
     }
 
     componentDidCatch(error) {
+        console.log(error)
         this.setState({error})
     }
 
     render() {
         if (this.state.error) {
-            return < ModalWindow content={this.state.error.toString()} />
+            return (
+                <div className="error-board">
+                    {this.state.error.toString()}
+                </div>
+            )
         }
         return this.props.children
     }

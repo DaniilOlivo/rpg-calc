@@ -1,4 +1,4 @@
-import ModalWindow from "../components/ModalWindow"
+import useModal from "../components/ModalWindow"
 import React from "react"
 import menuImage from "./img/menu.png"
 import "./SpecialBtns.css"
@@ -8,64 +8,38 @@ import store from "../Redux/store"
 import socket from "../Socket"
 
 import versions from "../data/versions-logs.json"
+import colorsMarkers from "../data/colors-markers.json"
 
-// Абстрактный класс для кнопок использующих модальные окна
-// Потому что в санном JS нет нормальной реализации миксинов
-class BtnModal extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {modal: false, content: "..."}
-    }
 
-    onClick = (e) => {
-        this.setState({modal: true})
-    }
+function BtnLog(props) {
+    let listVersions = []
+    for (let [versionNumber, listChanges] of Object.entries(versions)) {
+        listVersions.push(<p key={versionNumber} className="logs__title">{versionNumber}</p>)
 
-    closeModal = (e) => {
-        this.setState({modal: false})
-    }
-
-    getModal() {
-        let modal = null
-        if (this.state.modal) {
-            modal = < ModalWindow content={this.state.content} onClick={this.closeModal} />
+        let liElements = []
+        for (let i = 0; i < listChanges.length; i++) {
+            let elem = <li key={i}>{listChanges[i]}</li>
+            liElements.push(elem)
         }
 
-        return modal
+        listVersions.push(<ul key={versionNumber + "changes"} className="logs__list-changes">{liElements}</ul>)
     }
+
+    const [modal, openModal] = useModal(listVersions)
+
+    return (
+        <div className="logs">
+            <button className="btn-special-funcions" onClick={openModal}>
+                <img src={menuImage} className="log-version__img" alt="Menu"/>
+            </button>
+
+            {modal}
+        </div>
+    )
 }
 
 
-class BtnLog extends BtnModal {
-    componentDidMount() {
-        let content = []
-        
-        for (let [version, listChanges] of Object.entries(versions)) {
-            content.push(<p key={version} className="logs__title">{version}</p>)
-            let liElements = []
-            for (let i = 0; i < listChanges.length; i++) {
-                let elem = <li key={i}>{listChanges[i]}</li>
-                liElements.push(elem)
-            }
-            content.push(<ul key={version + "changes"} className="logs__list-changes">{liElements}</ul>)
-        }
-        this.setState({content})
-    }
-
-    render() {
-         return (
-             <div className="logs">
-                 <button className="btn-special-funcions" onClick={this.onClick}>
-                    <img src={menuImage} className="log-version__img" alt="Menu"/>
-                </button>
-                {this.getModal()}
-             </div>
-         )
-    }
-}
-
-// Функции разработчика
-function ExitProfile(props) {
+function BtnExitProfile(props) {
     let onClick = async (e) => {
         let response = await fetch("/auth/logout", {method: "POST"})
         if (response.ok) window.location.href = response.url
@@ -73,41 +47,36 @@ function ExitProfile(props) {
     return <button className="dev-func__btn" onClick={onClick}>Выйти из профиля</button>
 }
 
-class BtnDev extends BtnModal {
-    componentDidMount() {
-        let content = <div className="dev-func-block">
-            < ExitProfile />
+function BtnDev(props) {
+    const [modal, openModal] = useModal(
+        <div className="dev-func-block">
+            < BtnExitProfile />
         </div>
-        this.setState({content: content})
-    }
+    )
 
-    render() {
-        return (
-            <div className="dev">
-                <button className="btn-special-funcions" onClick={this.onClick}>func</button>
-                {this.getModal()}
-            </div>
-        )
-    }
+    return (
+        <div className="dev">
+            <button className="btn-special-funcions" onClick={openModal}>func</button>
+
+            {modal}
+        </div>
+    )
 }
 
 function PickColor(props) {
-    const colors = ["white", "yellow", "orange", "blue", "violet",
-        "red", "black", "gray", "green", "purple",
-        "lime", "crimson", "darkred", "pink", "magenta",
-        "indigo", "darkgreen", "olive", "cyan", "navy",
-        "wheat", "chocolate", "maroon",
-    ]
+    // currentColor - текущий цвет пользователя
     let btnsColors = []
 
-    let count = 0
-
-    for (let color of colors) {
-        btnsColors.push(<div className="pick-color__btn" onClick={e => socket.signalSetColor(color)} key={count}>
+    for (let color of colorsMarkers) {
+        let classNameBtn = "pick-color__btn"
+        if (props.currentColor === color) classNameBtn += " pick-color__btn_selected"
+        btnsColors.push(
+            <div className={classNameBtn} onClick={e => socket.signalSetColor(color)} key={color}>
                 <div className="marker" style={{backgroundColor: color}}></div>
-            </div>)
-        count++
+            </div>
+        )
     }
+
     return (
         <div className="pick-color">
             <p className="pick-color__title">Выбери свой цвет!</p>
@@ -118,45 +87,57 @@ function PickColor(props) {
     )
 }
 
-export class BtnPickColor extends BtnModal {
-    componentDidMount() {
-        this.setState({content: < PickColor />})
-    }
+export function BtnPickColor(props) {
+    // color - текущий цвет игрока, для отображения его на кнопке
+    const [modal, openModal] = useModal(< PickColor currentColor={props.color} />)
 
-    render() {
-        let marker = <div className="marker" style={{backgroundColor: this.props.color}}></div>
-        return (
-            <div className="color">
-                 <button className="btn-special-funcions btn-special-funcions__marker" onClick={this.onClick}>{marker}</button>
-                 {this.getModal()}
-            </div>
-        )
-    }
+    let marker = <div className="marker" style={{backgroundColor: props.color}}></div>
+
+    return (
+        <div className="color">
+            <button className="btn-special-funcions btn-special-funcions__marker" onClick={openModal}>{marker}</button>
+
+            {modal}
+        </div>
+    )
 }
 
-// Панель кнопок
+
 function PanelBtnsSpecial(props) {
     let btns = [
         < BtnLog key="log"/>,
         < BtnDev key="func" />
     ]
 
-    if (props.boolUser && !props.boolAdmin) {
-        let mapStateToProps = (state) => {
-            return {color: state.get("char").color}
-        }
-        let Wrap = connect(mapStateToProps)(BtnPickColor)
-        let btnColor = <Provider store={store} key="color">
-            < Wrap />
-        </Provider>
-        btns.push(btnColor)
+    if (props.user) {
+        btns.push(< BtnPickColor color={props.color} key="color" />   )
     }
 
     return (
         <div className="panel-btns-special">
-            {btns}    
+            {btns}
         </div> 
     )
 }
 
-export default PanelBtnsSpecial
+function mapStateToProps(state) {
+    let user = state.get("user")
+    
+    let color = null
+    let username = user.username
+    let userBool = Boolean(username)
+
+    if (userBool) {
+        color = user.color
+    }
+
+    return {
+        color,
+        user: userBool,
+    }
+}
+
+let WrapPanelBtnsSpecial = connect(mapStateToProps)(PanelBtnsSpecial)
+let ReduxPanelBtnsSpecial = <Provider store={store} key="panel-btns" >< WrapPanelBtnsSpecial /></Provider>
+
+export default ReduxPanelBtnsSpecial

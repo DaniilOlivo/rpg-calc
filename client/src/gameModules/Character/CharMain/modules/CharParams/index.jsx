@@ -3,7 +3,7 @@ import "./CharParam.css"
 import ScaleSolid from "../../../../components/Scales/ScaleSolid"
 import ScaleSegment from "../../../../components/Scales/ScaleSegment"
 
-import ElementGC from "../../../../components/ElementGC"
+// import ElementGC from "../../../../components/ElementGC"
 
 
 function CharParam(props) {
@@ -30,20 +30,20 @@ function CharParam(props) {
             } 
         }
         
-        paramsComponents.push(
-            <ElementGC
-                idElement={id}
-                gameElement={gameObject}
-                schemeData={schemeData}
-                title={paramObj.title}
-                key={id}>
-                < ScaleSolid
-                    title={id}
-                    currentValue={gameObject.current}
-                    maxValue={gameObject.max.value}
-                    classNameColor={`scale_solid__fill_${id}`} />
-            </ElementGC>
-        )
+        // paramsComponents.push(
+        //     <ElementGC
+        //         idElement={id}
+        //         gameElement={gameObject}
+        //         schemeData={schemeData}
+        //         title={paramObj.title}
+        //         key={id}>
+        //         < ScaleSolid
+        //             title={id}
+        //             currentValue={gameObject.current}
+        //             maxValue={gameObject.max.value}
+        //             classNameColor={`scale_solid__fill_${id}`} />
+        //     </ElementGC>
+        // )
     }
 
     let needsData = [
@@ -68,21 +68,21 @@ function CharParam(props) {
                 label: "Максимальное значение " + needObj.labelCase
             }
         }
-        console.log(gameObject)
+        
         needsComponents.push(<span key={title}>{title}</span>)
-        needsComponents.push(
-            <ElementGC
-                idElement={id}
-                gameElement={gameObject}
-                schemeData={schemeData}
-                title={title}
-                key={id}>
-                < ScaleSegment 
-                        currentValue={gameObject.current}
-                        maxValue={gameObject.max.value}
-                        classNameColor={`scale_segment__fill_${needObj.color}`} />
-            </ElementGC>
-        )
+        // needsComponents.push(
+        //     <ElementGC
+        //         idElement={id}
+        //         gameElement={gameObject}
+        //         schemeData={schemeData}
+        //         title={title}
+        //         key={id}>
+        //         < ScaleSegment 
+        //                 currentValue={gameObject.current}
+        //                 maxValue={gameObject.max.value}
+        //                 classNameColor={`scale_segment__fill_${needObj.color}`} />
+        //     </ElementGC>
+        // )
     }
 
     return (
@@ -95,7 +95,7 @@ function CharParam(props) {
 
             <div className="char-param__main">
                 <p>{props.name}</p>
-                <p>{props.race}</p>
+                <p>{props.race.title}</p>
             </div>
 
             <div className="char-param__scales_second">

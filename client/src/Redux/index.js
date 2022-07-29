@@ -1,16 +1,34 @@
 import store from "./store";
-import { actionSetCharData, actionPushLog } from "./actions"
+import * as actions from "./actions"
 
-const throwErrorUndefined = (value) => {
-    throw new Error("Redux > API: Даны следующие данные " + value)
+import * as gameController from "../GameController"
+
+
+export function setController(controller) {
+    dispatchStore(actions.setController(controller))
+
+    let currentState = store.getState()
+    let user = currentState.get("user")
+
+    let character
+    if (user.admin) {
+        // Check if the character has already been recorded in redux
+        // So that the admin does not reset the current character when updating the game
+        let lastCharacter = currentState.get("character")
+        let nameLastCharacter = lastCharacter.name
+        if (nameLastCharacter) {
+            character = gameController.getCharacter(currentState, nameLastCharacter)
+        } else {
+            character = gameController.getGroupObjects(currentState, "player")[0]
+        }
+    } else {
+        character = gameController.getCharacter(currentState, user.character)
+    }
+    dispatchStore(actions.setCharacter(character))
 }
 
-export function setCharData(charData) {
-    if (!charData) throwErrorUndefined(charData)
-    store.dispatch(actionSetCharData(charData))
+export function dispatchStore(action) {
+    store.dispatch(action)
 }
 
-export function pushLog(message) {
-    if (!message) throwErrorUndefined(message)
-    store.dispatch(actionPushLog(message))
-}
+export default dispatchStore

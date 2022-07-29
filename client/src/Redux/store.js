@@ -3,8 +3,12 @@ import reducer from "./reducer"
 import { Map, List } from "immutable"
 
 export const initState = Map({
-    "char": {},
-    "log": List()
+    "globalController": {},
+    "character": {},
+    "users": Map(),
+    "user": {},
+    "log": List(),
+    "flags": Map(),
 })
 
 const store = createStore(reducer, initState)

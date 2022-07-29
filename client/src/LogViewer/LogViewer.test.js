@@ -1,39 +1,41 @@
 import { mount, configure } from "enzyme"
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17"
 
-configure({adapter: new Adapter()})
-
 import { LogViewerComponent } from "."
 import socket from "../Socket"
 
-describe("LogViewer", () => {
-    it("", () => {
-        socket.sendMessage = jest.fn()
+import { Map } from "immutable"
 
-        let log = [
-            {
-                type: "HELLO",
-                color: "green",
-                from: "Поркчоп",
-                message: "Зашел"
-            },
-            {
-                type: "MESSAGE",
-                color: "white",
-                from: "Поркчоп",
-                message: "А как играть?"
-            }
-        ]
+configure({adapter: new Adapter()})
 
-        let component = mount(< LogViewerComponent log={log} />)
-        let messages = component.find(".log-viewer__record")
-        expect(messages.length).toBe(2)
-        let input = component.find(".log-input")
-        input.instance().value = 'Отстой какой-то!'
-        input.simulate("keydown", {key: "Enter"})
-        
-        let calls = socket.sendMessage.mock.calls
-        expect(calls.length).toBe(1)
-        expect(calls[0][0]).toBe("Отстой какой-то!")
-    })
+const users = Map({
+    "Поркчоп": {color: "white"},
+})
+
+const log = [
+    {
+        type: "HELLO",
+        from: "Поркчоп",
+        message: "Зашел"
+    },
+    {
+        type: "MESSAGE",
+        from: "Поркчоп",
+        message: "А как играть?"
+    }
+]
+
+it("LogViewer", () => {
+    socket.sendMessage = jest.fn()
+
+    let component = mount(< LogViewerComponent log={log} users={users} />)
+    let messages = component.find(".log-viewer__record")
+    expect(messages.length).toBe(2)
+    let input = component.find(".log-input")
+    input.simulate("change", { target: { value: "Отстой какой-то!" } })
+    input.simulate("keydown", {key: "Enter"})
+    
+    let calls = socket.sendMessage.mock.calls
+    expect(calls.length).toBe(1)
+    expect(calls[0][0]).toBe("Отстой какой-то!")
 })

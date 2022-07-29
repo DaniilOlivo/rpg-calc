@@ -70,7 +70,11 @@ describe("Cигналы", () => {
         it("Подтверждение регистрации", () => {
             const expectPacakge = {
                 signal: "REGISTER",
-                admin: false
+                user: {
+                    username: "Поркчоп",
+                    admin: false,
+                    character: "Барак"
+                }
             }
             assert.deepEqual(getPacakge(wsSpy), expectPacakge)
         })

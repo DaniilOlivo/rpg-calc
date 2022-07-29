@@ -1,8 +1,10 @@
 import React from "react";
 import { Provider, connect } from "react-redux"
-import adminStore from "../../Redux/admin/store";
-import { setCurrent } from "../../Redux/admin/actions";
-import { setChar } from "../../Redux/admin"
+
+import { setCharacter } from "../../Redux/actions"
+import store from "../../Redux/store";
+
+import { getGroupObjects } from "../../GameController"
 
 import "./CharsMenu.css"
 
@@ -19,54 +21,45 @@ function MenuBtn(props) {
     )
 }
 
-export class CharsMenu extends React.Component {
-    onClick = (char) => {
-        this.props.setCurrent(char)
-        setChar()
-    } 
+export function CharsMenu(props) {
+    let arrBtns = []
 
-    render() {
-        let currentChar = this.props.currentChar
-        let arrBtns = []
-        for (let i = 0; i < this.props.chars.length; i++) {
-            let char = this.props.chars[i]
-            let selected = char.packageChar === currentChar
-            arrBtns.push(< MenuBtn 
-                title={char.nameChar}
-                colorMarker={char.color}
-                selected={selected}
-                key={i}
-                onClick={(e) => this.onClick(char.packageChar)} />)
-        }
+    for (let character of props.characters) {
+        let nameChar = character.name
+        let user = props.users.find((dataUser) => dataUser.character === nameChar)
+        if (!user) throw new Error("Admin > Not found user")
 
-        return (
-            <div className="chars-menu">
-                {arrBtns}
-            </div>
-        )
+        let selected = props.currentCharacter.name === nameChar
+
+        arrBtns.push(< MenuBtn 
+            title={nameChar}
+            colorMarker={user.color}
+            selected={selected}
+            key={nameChar}
+            onClick={(e) => props.setCharacter(character)}
+        />)
     }
+
+    return (
+        <div className="chars-menu">
+            {arrBtns}
+        </div>
+    )
 }
 
 export function mapStateToProps(state) {
-    let currentChar = state.get("currentChar")
-    if (!currentChar) throw new Error("Admin > CharsMenu: Нет текущего персонажа")
-    let mapProps = {
-        chars: [],
-        currentChar
-    }
-    let chars = state.get("chars")
-    for (let [nameChar, packageChar] of chars.entries()) {
-        mapProps.chars.push({
-            nameChar,
-            color: packageChar.color,
-            packageChar
-        })
-    }
+    let characters = getGroupObjects(state, "player")
+    let currentCharacter = state.get("character")
+    let users = state.get("users")
 
-    return mapProps
+    return {
+        characters,
+        currentCharacter,
+        users
+    }
 }
 
-let Wrap = connect(mapStateToProps, {setCurrent})(CharsMenu)
-let CharsMenuView = <Provider store={adminStore} >< Wrap /></Provider>
+let Wrap = connect(mapStateToProps, {setCharacter})(CharsMenu)
+let CharsMenuView = <Provider store={store} >< Wrap /></Provider>
 
 export default CharsMenuView

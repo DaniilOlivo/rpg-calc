@@ -39,9 +39,25 @@ class Socket {
         return await python.callCore("SET", JSON.stringify(packageChange))
     }
 
+    async getUsersData() {
+        let tableUsers = {}
+
+        let users = await userDB.getAllUsers()
+        for (let user of users) {
+            let {username, admin, character, color} = user
+            let objUser = {username, admin, character, color}
+            tableUsers[username] = objUser
+        }
+
+        let user = tableUsers[this.user.username]
+        
+        return {signal: "USER_DATA", user, users: tableUsers}
+    }
+
     async changeColor(new_color) {
         this.user.color = new_color
         await this.user.save()
+        this.broadcast(await this.getUsersData())
     }
 
     pingPong() {
@@ -53,7 +69,8 @@ class Socket {
         this.logger("REGISTER " + username)
         this.user = await userDB.getUser({username})
         this.journalWs.addSocket(this.ws, this.user)
-        this.send({signal: "REGISTER", admin: this.user.admin})
+
+        this.send(await this.getUsersData())
         this.broadcast(log.packageMesHello(this.user))
     }
 
@@ -86,6 +103,7 @@ class Socket {
         if (signal === "REGISTER") this.register(packageWs.username)
         if (signal === "GET") this.get()
         if (signal === "SET") this.set(packageWs.packageChange)
+        if (signal === "CHANGE_COLOR") this.changeColor(packageWs.color)
         if (signal === "MESSAGE") this.message(packageWs.message)
     }
 

@@ -1,12 +1,16 @@
 import { mount, configure } from "enzyme"
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17"
 
-configure({adapter: new Adapter()})
-
 import { BtnPickColor } from "."
 import socket from "../Socket"
 
+import ReactModal from "react-modal"
+
+configure({adapter: new Adapter()})
+
 describe("Special Buttons", () => {
+    ReactModal.setAppElement = jest.fn()
+
     it("Выбор цвета", () => {
         socket.signalSetColor = jest.fn()
         let component = mount(< BtnPickColor color="green" />)

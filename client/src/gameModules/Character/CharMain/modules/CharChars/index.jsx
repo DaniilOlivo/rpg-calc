@@ -1,7 +1,7 @@
 import "./CharChars.css"
 
-import ModGC from "../../../../components/ModGC"
-import GameComponent from "../../../../components/GameComponent"
+// import ModGC from "../../../../components/ModGC"
+// import GameComponent from "../../../../components/GameComponent"
 
 function getTipText(modSystem) {
     let modValues = []
@@ -19,8 +19,9 @@ function getTipText(modSystem) {
 
 function CharChars(props) {
     let arrChars = []
-
+    console.log(Object.entries(props))
     for (let [id, objChar] of Object.entries(props)) {
+        if (id === "py/object" || id.startsWith("_")) continue
         let tipText = getTipText(objChar.value)
 
         let schemeDataChar = {
@@ -32,19 +33,19 @@ function CharChars(props) {
 
         let value = objChar.value.value
 
-        arrChars.push(
-            <ModGC
-                idElement={id}
-                gameElement={objChar}
-                schemeData={schemeDataChar}
-                title={objChar.alias}
-                key={id}>
-                <div className="char-chars__line">
-                    <span className="char-chars__label" data-tip={objChar.desc}>{objChar.alias}</span>
-                    <span className="char-chars__value" data-tip={tipText}>{value}</span>
-                </div>
-            </ModGC>
-        )
+        // arrChars.push(
+        //     <ModGC
+        //         idElement={id}
+        //         gameElement={objChar}
+        //         schemeData={schemeDataChar}
+        //         title={objChar.alias}
+        //         key={id}>
+        //         <div className="char-chars__line">
+        //             <span className="char-chars__label" data-tip={objChar.desc}>{objChar.alias}</span>
+        //             <span className="char-chars__value" data-tip={tipText}>{value}</span>
+        //         </div>
+        //     </ModGC>
+        // )
     }
 
     return (

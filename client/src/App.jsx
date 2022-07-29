@@ -1,8 +1,10 @@
 import './App.css';
 import React from 'react';
-import PanelBtnsSpecial from './SpecialBtns';
+import { useEffect, useState } from "react"
+import useFetch from './utils/fetch';
 
 import LoadBox from './components/LoadBox';
+import panelBtnsSpecial from './SpecialBtns';
 import AuthApp from './Auth';
 import LogViewer from './LogViewer';
 
@@ -11,13 +13,14 @@ import CharsMenuView from './Admin/CharsMenu';
 
 import socket from './Socket';
 
+
 function Main(props) {
   let adminFunctions = null
   if (props.admin) {
     adminFunctions = CharsMenuView
   }
   return (
-    <main>
+    <main key="main">
       < TabsControl />
       <div className="log-container">
         {LogViewer}
@@ -27,55 +30,39 @@ function Main(props) {
   )
 }
 
-class App extends React.Component {
-  constructor(props) {
-    super(props)
+function App(props) {
+  const loadBox = < LoadBox key="load" />
 
-    this.state = {content: null, user: false, admin: false}
-  }
+  const [content, setContent] = useState(loadBox)
+  const [user, setUser] = useFetch("/auth/user")
 
-  async componentDidMount() {
-    let response = await fetch("/auth/user")
-    if (response.ok) {
-      let dataUser = await response.json()
-      if (dataUser.user) {
-        this.setState({
-          user: dataUser.user,
-          admin: dataUser.admin
-        })
-      }
-    }
-    
-    if (this.state.user) {
-      this.loadResourses()
+  useEffect(() => {
+    let username = user.username
+    if (username) {
+      setContent(loadBox)
+      socket.signalRegister(username)
+      setTimeout(() => setContent(< Main admin={user.admin} key="main" />), 10000)
     } else {
-      this.setState({content: < AuthApp next={this.succesAuth} />})
+      setContent(< AuthApp next={user => setUser(user)} key="auth" />)
     }
-  }
+  }, [user, setUser])
 
-  componentWillUnmount() {
-    socket.close()
-  }
+  useEffect(() => {
+    return () => {
+      socket.close()
+    }
+  }, [])
 
-  succesAuth = (user) => {
-    this.setState(user)
-    this.loadResourses()
-  }
+  let displayContent = [
+    panelBtnsSpecial,
+    content
+  ]
 
-  loadResourses = () => {
-    this.setState({content: < LoadBox />})
-    setTimeout(() => this.setState({content: <  Main admin={this.state.admin} />}), 10000)
-    socket.signalRegister(this.state.user)
-  }
-
-  render() {
-    return (
-      <div className="wrap">
-        < PanelBtnsSpecial boolUser={this.state.user} boolAdmin={this.state.admin} />
-        { this.state.content }
-      </div>
-    )
-  }
+  return (
+    <div className="wrap">
+      {displayContent}
+    </div>
+  )
 }
 
 export default App;

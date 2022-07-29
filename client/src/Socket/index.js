@@ -1,5 +1,5 @@
-import { setCharData, pushLog } from "../Redux"
-import { setListChars } from "../Redux/admin"
+import {dispatchStore, setController} from "../Redux"
+import * as redux from "../Redux/actions"
 
 const wsConnect = "ws://127.0.0.1:5500/ws/table"
 
@@ -17,7 +17,7 @@ class Socket extends WebSocket {
         }
 
         this.onclose = (e) => {
-            console.log("Сокет соединение прервано")
+            console.log("Сокет соединение закрыто")
         }
     }
 
@@ -29,27 +29,23 @@ class Socket extends WebSocket {
         this.send({signal: "GET"})
     }
 
-    signalGetAll() {
-        this.send({signal: "GET_ALL"})
-    }
-
-    signalRegister(user) { 
-        throwErrorUnvalidArg(user)
+    signalRegister(username) { 
+        throwErrorUnvalidArg(username)
         let packageWs = {
             signal: "REGISTER",
-            user
+            username
         }
         this.send(packageWs)
     }
 
-    signalSet(data) {
-        throwErrorUnvalidArg(data)
-        this.send({signal: "SET", data})
+    signalSet(packageChange) {
+        throwErrorUnvalidArg(packageChange)
+        this.send({signal: "SET", packageChange})
     }
 
     signalSetColor(color) {
         throwErrorUnvalidArg(color)
-        this.send({signal: "SET_COLOR", color})
+        this.send({signal: "CHANGE_COLOR", color})
     }
 
     sendMessage(message) {
@@ -59,16 +55,15 @@ class Socket extends WebSocket {
 
     dispatcher(data) {
         if (data.test) console.log(data.test)
-        if (data.package) {
-            if (data.character) setListChars(data.character, data.package)
-            else setCharData(data.package)
-        }
-        if (data.message) pushLog(data)
+        if (data.package) setController(data.package)
+        if (data.message) dispatchStore(redux.pushLog(data))
         if (data.signal) {
             let signal = data.signal
-            if (signal === "REGISTER") {
-                if (data.admin) this.signalGetAll()
-                else this.signalGet()
+            if (signal === "USER_DATA") {
+                let {users, user} = data
+                dispatchStore(redux.setUsers(users))
+                dispatchStore(redux.setUser(user))
+                this.signalGet()
             }
         }
     }

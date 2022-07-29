@@ -1,38 +1,32 @@
 import { mount, configure } from "enzyme"
 import Adapter from "@wojtekmaj/enzyme-adapter-react-17"
 
-configure({adapter: new Adapter()})
-
-import { CharsMenu, mapStateToProps } from "./CharsMenu"
-import * as adminRedux from "../Redux/admin"
+import { CharsMenu } from "./CharsMenu"
 import { Map } from "immutable"
 
-const char_1 = {
-    charMain: {name: "Барак"},
-    color: "green"
-}
+configure({adapter: new Adapter()})
 
-const char_2 = {
-    charMain: {name: "Чан Кочан"},
-    color: "white"
-}
+const users = Map({
+    "Поркчоп": {
+        color: "green",
+        character: "Барак"
+    },
+    "Чан Кочан": {
+        color: "white",
+        character: "Олег"
+    }
+})
+
+const currentChar = {name: "Барак"}
 
 const listChars = [
-    {
-        nameChar: "Барак",
-        color: "green",
-        packageChar: char_1
-    },
-    {
-        nameChar: "Чан Кочан",
-        color: "white",
-        packageChar: char_2
-    }
+    {name: "Барак"},
+    {name: "Олег"}
 ]
 
-describe("Admin", () => {
+describe("Admin Menu Chars", () => {
     it("Все персонажи появились", () => {
-        let component = mount(< CharsMenu setCurrent={jest.fn()} currentChar={char_1} chars={listChars} />)
+        let component = mount(< CharsMenu setCharacter={jest.fn()} characters={listChars} currentCharacter={currentChar} users={users} />)
         let btnsChars = component.find(".chars-menu__btn")
         let firstChar = btnsChars.first()
         expect(firstChar.find(".chars-menu__btn p").text()).toBe("Барак")
@@ -40,37 +34,17 @@ describe("Admin", () => {
         expect(firstChar.find(".chars-menu__marker").props().style).toEqual({backgroundColor: 'green'})
 
         let secondChar = btnsChars.last()
-        expect(secondChar.find(".chars-menu__btn p").text()).toBe("Чан Кочан")
+        expect(secondChar.find(".chars-menu__btn p").text()).toBe("Олег")
     })
 
     it("Вызов API", () => {
-        let spySetCurrent = jest.fn()
-        adminRedux.setChar = jest.fn()
+        let spySetCharacter = jest.fn()
 
-        let component = mount(< CharsMenu setCurrent={spySetCurrent} currentChar={char_1} chars={listChars} />)
+        let component = mount(< CharsMenu setCharacter={spySetCharacter} characters={listChars} currentCharacter={currentChar} users={users} />)
         
         component.find(".chars-menu__btn").last().simulate("click")
-        let callsSetCurrent = spySetCurrent.mock.calls
-        expect(callsSetCurrent.length).toBe(1)
-        expect(callsSetCurrent[0][0]).toEqual(char_2)
-        
-        expect(adminRedux.setChar.mock.calls.length).toBe(1)
-    })
-
-    it("Connect Redux", () => {
-        let stateStore = Map({
-            "chars": Map({
-                "Барак": char_1,
-                "Чан Кочан": char_2
-            }),
-            "currentChar": char_1
-        })
-
-        let mapProps = mapStateToProps(stateStore)
-        let expectProps = {
-            "chars": listChars,
-            "currentChar": char_1
-        }
-        expect(mapProps).toEqual(expectProps)
+        let callsSetCharacter = spySetCharacter.mock.calls
+        expect(callsSetCharacter.length).toBe(1)
+        expect(callsSetCharacter[0][0]).toEqual({name: "Олег"})
     })
 })
