@@ -1,5 +1,6 @@
 import unittest
 from utils.findRecursion import findRecursion, EMPTY
+from utils.clear_shandow import clear_shandow
 
 class TestFindRecursion (unittest.TestCase):
     def setUp(self):
@@ -25,3 +26,20 @@ class TestFindRecursion (unittest.TestCase):
 
         result = findRecursion(target, self.data)
         self.assertEqual(result, EMPTY)
+
+class TestClearShandow (unittest.TestCase):
+    def setUp(self):
+        self.source_obj = {
+            "py/object": "libs.player.Player",
+            "__dict__": {},
+            "name": "Барак",
+            "stats": {
+                "py/object": "libs.player.Stats",
+                "hp": 20
+            }
+        }
+    
+    def test_clear(self):
+        cleaning_obj = clear_shandow(self.source_obj)
+        self.assertFalse(cleaning_obj.get("py/object", False))
+        self.assertFalse(cleaning_obj["stats"].get("py/object", False))
